@@ -128,6 +128,44 @@ class TrajectoryWriter:
             json.dumps(meta, indent=2, ensure_ascii=False) + "\n"
         )
 
+# load/read trajectories (for judge, decomposer)
+
+def load_trajectory(traj_dir: str | Path) -> dict:
+    """
+    Load a single trajectory from disk.
+
+    Returns:
+        {"metadata": dict, "steps": list[dict]}
+    """
+    traj_dir = Path(traj_dir)
+    meta_path = traj_dir / "metadata.json"
+    steps_path = traj_dir / "steps.jsonl"
+
+    metadata = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+
+    steps: list[dict] = []
+    if steps_path.exists():
+        with open(steps_path) as f:
+            for line in f:
+                line = line.strip()
+                if line:
+                    steps.append(json.loads(line))
+
+    return {"metadata": metadata, "steps": steps}
+
+
+def iter_trajectories(base_dir: str | Path):
+    """
+    Yield (trajectory_id, traj_dir_path) for every trajectory under base_dir,
+    sorted by directory name (i.e. chronological)
+    """
+    base = Path(base_dir)
+    if not base.exists():
+        return
+    for child in sorted(base.iterdir()):
+        if child.is_dir() and (child / "metadata.json").exists():
+            yield child.name, child
+
 
 def _make_id() -> str:
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
