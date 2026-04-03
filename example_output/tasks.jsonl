@@ -1,0 +1,320 @@
+{"url": "https://en.wikipedia.org", "goal": "Search for 'quantum computing' and click on the first search result"}
+{"url": "https://en.wikipedia.org", "goal": "Navigate to the page for 'Eiffel Tower' and scroll down to the 'Construction' section"}
+{"url": "https://en.wikipedia.org", "goal": "Click on the 'References' section heading on the 'Photosynthesis' article page"}
+{"url": "https://en.wikipedia.org", "goal": "Type 'Leonardo da Vinci' into the search bar and press Enter, then click the 'Biography' section link in the sidebar"}
+{"url": "https://en.wikipedia.org", "goal": "Navigate directly to https://en.wikipedia.org/wiki/Periodic_table and scroll to the 'Metalloids' row in the main table"}
+{"url": "https://en.wikipedia.org", "goal": "On the 'Climate change' article, click the 'External links' section and then click the first listed link"}
+{"url": "https://en.wikipedia.org", "goal": "Search for 'Turing test', then click the 'See also' section's first internal link"}
+{"url": "https://en.wikipedia.org", "goal": "Navigate to 'List of Nobel laureates in Physics' and scroll to the 1921 row to find Albert Einstein's award reason"}
+{"url": "https://en.wikipedia.org", "goal": "On the 'Apple Inc.' page, click the 'Infobox company' image thumbnail to view the full logo"}
+{"url": "https://en.wikipedia.org", "goal": "Search for 'mitochondria', then click the 'Cell biology' category link at the bottom of the page"}
+{"url": "https://en.wikipedia.org", "goal": "Navigate to 'United Nations' and click the 'Member states' link in the 'Structure' section"}
+{"url": "https://en.wikipedia.org", "goal": "On the 'World War II' article, scroll to the 'Chronology' table and locate the date of D-Day"}
+{"url": "https://en.wikipedia.org", "goal": "Search for 'Penicillin', then click the 'History' section heading to jump there"}
+{"url": "https://en.wikipedia.org", "goal": "Navigate to 'Solar System' and click the 'Moons' link in the 'Natural satellites' infobox"}
+{"url": "https://en.wikipedia.org", "goal": "Type 'Bengal tiger' into the search bar and press Enter, then click the 'Conservation status' infobox field"}
+{"url": "https://en.wikipedia.org", "goal": "Navigate to 'Fibonacci sequence' and scroll to the 'Applications' section to read the first sentence"}
+{"url": "https://en.wikipedia.org", "goal": "On the 'Artificial intelligence' page, click the 'Outline' link in the top-right navigation bar"}
+{"url": "https://en.wikipedia.org", "goal": "Search for 'Mozart', then click the 'Works' section's first bulleted link (e.g., 'Symphony No. 40')"}
+{"url": "https://en.wikipedia.org", "goal": "Navigate to 'International Space Station' and click the 'Docking ports' row in the 'Modules' table"}
+{"url": "https://en.wikipedia.org", "goal": "On the 'Photosynthesis' article, click the 'C4 carbon fixation' link in the 'Light-dependent reactions' paragraph"}
+{"url": "https://www.reddit.com", "goal": "Click on the 'r/programming' link in the sidebar to navigate to that subreddit"}
+{"url": "https://www.reddit.com", "goal": "Type 'cats' into the search bar and press Enter to view search results"}
+{"url": "https://www.reddit.com", "goal": "Scroll down to load more posts and click the 'Next' button at the bottom of the page"}
+{"url": "https://www.reddit.com", "goal": "Click on the 'Hot' tab to switch from 'Top' to 'Hot' sorting on the front page"}
+{"url": "https://www.reddit.com", "goal": "Navigate to https://www.reddit.com/r/science/ and scroll to read the title of the top post"}
+{"url": "https://www.reddit.com", "goal": "Click on the 'All' dropdown in the header and select 'Random' to visit a random subreddit"}
+{"url": "https://www.reddit.com", "goal": "Click on the 'Trending' link in the right sidebar to view trending subreddits"}
+{"url": "https://www.reddit.com", "goal": "Type 'pizza recipe' into the search bar, press Enter, then click the 'Subreddit' filter button"}
+{"url": "https://www.reddit.com", "goal": "Navigate to https://www.reddit.com/r/aww/ and click the first image post thumbnail"}
+{"url": "https://www.reddit.com", "goal": "Scroll to the footer and click the 'About' link"}
+{"url": "https://www.reddit.com", "goal": "Click the 'Create Post' button on the front page and then click 'Cancel'"}
+{"url": "https://www.reddit.com", "goal": "Click on the 'r/funny' link in the 'Popular Communities' section"}
+{"url": "https://www.reddit.com", "goal": "Type 'climate change' in the search bar, press Enter, then click the 'Past Year' time filter"}
+{"url": "https://www.reddit.com", "goal": "Navigate to https://www.reddit.com/r/learnpython/ and read the text of the pinned post's title"}
+{"url": "https://www.reddit.com", "goal": "Click the 'Rules' link beneath the subreddit name on https://www.reddit.com/r/AskReddit/"}
+{"url": "https://www.reddit.com", "goal": "Scroll down the front page and click the 'More Comments' link on the third visible post"}
+{"url": "https://www.reddit.com", "goal": "Click the 'Home' logo in the top-left corner to return to the front page"}
+{"url": "https://www.reddit.com", "goal": "Click the 'New' tab to switch from 'Hot' to 'New' sorting on r/technology"}
+{"url": "https://www.reddit.com", "goal": "Navigate to https://www.reddit.com/r/EarthPorn/ and click the 'Grid' view button"}
+{"url": "https://www.reddit.com", "goal": "Type 'NASA' in the search bar, press Enter, then click the 'Search within r/space' option"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Latest' link in the top navigation bar"}
+{"url": "https://news.ycombinator.com", "goal": "Type 'Rust' into the search bar and press Enter"}
+{"url": "https://news.ycombinator.com", "goal": "Scroll down to load the next page of stories and click the 'More' link"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the story titled 'The State of WebAssembly in 2024'"}
+{"url": "https://news.ycombinator.com", "goal": "Navigate to https://news.ycombinator.com/user?id=username123 and read the user's bio"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Submit' link in the top navigation bar"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Comments' link next to the top-ranked story on the homepage"}
+{"url": "https://news.ycombinator.com", "goal": "Type 'privacy' into the search bar, press Enter, then click the 'Points' column header to sort by score"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Login' link and then click 'Cancel' to return to the homepage"}
+{"url": "https://news.ycombinator.com", "goal": "Scroll to the bottom of the homepage and click the 'Apply to YC' link"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'FAQ' link in the footer"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'API' link in the footer and read the first paragraph of the description"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Security' link in the footer"}
+{"url": "https://news.ycombinator.com", "goal": "Type 'React' into the search bar, press Enter, then scroll down to the third result and click it"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Best' link in the top navigation bar"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Ask' link in the top navigation bar"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Jobs' link in the top navigation bar"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'Login' link, then click the 'Forgot password?' link"}
+{"url": "https://news.ycombinator.com", "goal": "Scroll down to the 'Hacker News' logo in the footer and click it to return to the homepage"}
+{"url": "https://news.ycombinator.com", "goal": "Click on the 'About' link in the footer"}
+{"url": "https://stackoverflow.com", "goal": "Search for 'Python list comprehension' and click on the top question result"}
+{"url": "https://stackoverflow.com", "goal": "Navigate to https://stackoverflow.com/questions/tagged/python and scroll down to view the third question"}
+{"url": "https://stackoverflow.com", "goal": "Click on the 'JavaScript' tag in the Popular Tags sidebar"}
+{"url": "https://stackoverflow.com", "goal": "Type 'how to flatten a nested list' into the search bar and press Enter"}
+{"url": "https://stackoverflow.com", "goal": "Click on the 'Highest Scored' tab on the Questions page"}
+{"url": "https://stackoverflow.com", "goal": "Navigate to https://stackoverflow.com/help and scroll to the 'How do I ask a good question?' section"}
+{"url": "https://stackoverflow.com", "goal": "Click on the 'Ask Question' button and then click the 'Cancel' button without submitting"}
+{"url": "https://stackoverflow.com", "goal": "Search for 'React useEffect dependency array' and click on the first answer with at least 50 upvotes"}
+{"url": "https://stackoverflow.com", "goal": "Navigate to https://stackoverflow.com/tags and find the tag with exactly '123456' questions (displayed next to the tag name)"}
+{"url": "https://stackoverflow.com", "goal": "Click on the 'Featured' tab on the Questions page and scroll to the second featured question"}
+{"url": "https://stackoverflow.com", "goal": "Search for 'git revert last commit' and click on the accepted answer of the top result"}
+{"url": "https://stackoverflow.com", "goal": "Navigate to https://stackoverflow.com/questions and click the 'Newest' tab, then scroll down to see the 5th question"}
+{"url": "https://stackoverflow.com", "goal": "Click on the 'About' link in the footer and scroll to the 'Stack Overflow is a community' paragraph"}
+{"url": "https://stackoverflow.com", "goal": "Search for 'SQL JOIN vs INNER JOIN' and click on the question titled 'What is the difference between JOIN and INNER JOIN?'"}
+{"url": "https://stackoverflow.com", "goal": "Navigate to https://stackoverflow.com/tags/java/info and read the first sentence of the tag description"}
+{"url": "https://stackoverflow.com", "goal": "Click on the 'Unanswered' tab on the Questions page and scroll to the first question with zero answers"}
+{"url": "https://stackoverflow.com", "goal": "Search for 'C# async await best practices' and click on the highest-scored answer"}
+{"url": "https://stackoverflow.com", "goal": "Navigate to https://stackoverflow.com/help/on-topic and locate the bullet point that mentions 'algorithms'"}
+{"url": "https://stackoverflow.com", "goal": "Click on the 'Stack Overflow' logo in the header to return to the homepage"}
+{"url": "https://stackoverflow.com", "goal": "Search for 'CSS flexbox center vertically' and click on the question with the most views"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Trending' tab and scroll down to view repositories trending today in Python"}
+{"url": "https://github.com/explore", "goal": "Type 'react' into the search bar and press Enter, then click on the first repository result"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Topics' link in the navigation bar and scroll to find the 'ai' topic card"}
+{"url": "https://github.com/explore", "goal": "Navigate to https://github.com/explore/trending/developers and scroll to see the top developer this week"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Trending' tab, then click the 'This week' filter button"}
+{"url": "https://github.com/explore", "goal": "Click on the 'JavaScript' language filter under 'Trending' and verify at least three repositories appear"}
+{"url": "https://github.com/explore", "goal": "Scroll down the homepage to the 'Explore topics' section and click on the 'web-development' topic"}
+{"url": "https://github.com/explore", "goal": "Click on the 'All languages' dropdown in the 'Trending' section and select 'Rust'"}
+{"url": "https://github.com/explore", "goal": "Type 'open-source game' into the search bar and press Enter, then scroll to the third result"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Trending' tab, then click the 'Repositories' tab (not Developers or Projects)"}
+{"url": "https://github.com/explore", "goal": "Navigate to https://github.com/topics/python and scroll to the 'Related topics' section"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Explore' logo in the header to return to the homepage"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Trending' tab, then click the 'This month' time filter"}
+{"url": "https://github.com/explore", "goal": "Scroll to the 'Trending repositories' section and click on the star icon next to the first listed repo"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Topics' link, then type 'docker' in the topic search box and press Enter"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Trending' tab, then click the 'Developers' tab and scroll to the fifth profile card"}
+{"url": "https://github.com/explore", "goal": "Type 'github actions tutorial' into the search bar and press Enter, then click the first non-repository result"}
+{"url": "https://github.com/explore", "goal": "Scroll to the footer and click the 'About' link"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Trending' tab, then click the 'Projects' tab and verify the page title includes 'Trending Projects'"}
+{"url": "https://github.com/explore", "goal": "Click on the 'Topics' link, scroll to the 'Popular topics' grid, and click on the 'machine-learning' topic"}
+{"url": "https://www.amazon.com", "goal": "Search for 'wireless earbuds' and click on the first product result"}
+{"url": "https://www.amazon.com", "goal": "Navigate to the 'Electronics' category page using the top navigation bar"}
+{"url": "https://www.amazon.com", "goal": "Scroll down to the 'Customer reviews' section on the product page for 'Kindle Paperwhite (11th Gen)'"}
+{"url": "https://www.amazon.com", "goal": "Click the 'Sort by: Avg. Customer Review' dropdown and select 'Highest Rated' on a search results page"}
+{"url": "https://www.amazon.com", "goal": "Type 'yoga mat' into the search bar and press Enter to view results"}
+{"url": "https://www.amazon.com", "goal": "Click on the 'See all' link under 'Shop by Department' on the homepage"}
+{"url": "https://www.amazon.com", "goal": "Find and click the 'Prime Eligible' filter checkbox on a search results page for 'coffee maker'"}
+{"url": "https://www.amazon.com", "goal": "Navigate directly to https://www.amazon.com/Best-Sellers/zgbs and scroll to the 'Electronics' bestseller list"}
+{"url": "https://www.amazon.com", "goal": "On a product page, click the 'Add to Cart' button without proceeding to checkout"}
+{"url": "https://www.amazon.com", "goal": "Click the 'New Releases' link in the 'Electronics' department sidebar"}
+{"url": "https://www.amazon.com", "goal": "Search for 'stainless steel water bottle', then click the 'Price: Low to High' sort option"}
+{"url": "https://www.amazon.com", "goal": "Scroll to the 'Frequently bought together' section on the 'Echo Dot (5th Gen)' product page"}
+{"url": "https://www.amazon.com", "goal": "Click the 'All' tab under customer reviews to view all written reviews for a product"}
+{"url": "https://www.amazon.com", "goal": "Navigate to the 'Home & Kitchen' category and click on the 'Vacuums & Floor Care' subcategory"}
+{"url": "https://www.amazon.com", "goal": "On a search results page for 'running shoes', click the 'Men' checkbox under 'Department' filters"}
+{"url": "https://www.amazon.com", "goal": "Find and click the 'Compare with similar items' link on a product page for 'Instant Pot Duo'"}
+{"url": "https://www.amazon.com", "goal": "Scroll to the 'Product Description' section on the 'Fire TV Stick 4K Max' product page"}
+{"url": "https://www.amazon.com", "goal": "Click the 'Sponsored' badge on any sponsored product listing to understand its label"}
+{"url": "https://www.amazon.com", "goal": "Search for 'organic cotton t-shirt' and then click the '3 stars & up' rating filter"}
+{"url": "https://www.amazon.com", "goal": "Navigate to https://www.amazon.com/gp/site-directory and locate the 'Toys & Games' category link"}
+{"url": "https://www.bbc.com/news", "goal": "Click on the 'World' section link in the main navigation bar"}
+{"url": "https://www.bbc.com/news", "goal": "Type 'Ukraine' into the search bar and press Enter"}
+{"url": "https://www.bbc.com/news", "goal": "Scroll down to the 'Business' section on the homepage and click the 'More Business' link"}
+{"url": "https://www.bbc.com/news", "goal": "Navigate directly to https://www.bbc.com/news/technology and scroll to the first headline"}
+{"url": "https://www.bbc.com/news", "goal": "Click on the 'Live' label next to any live coverage story to open its live page"}
+{"url": "https://www.bbc.com/news", "goal": "Click on the 'Sport' section link, then click the 'Football' subcategory link"}
+{"url": "https://www.bbc.com/news", "goal": "Find and click the 'UK' news section link in the regional navigation"}
+{"url": "https://www.bbc.com/news", "goal": "Type 'climate change' into the search bar, press Enter, and click the top article with a video icon"}
+{"url": "https://www.bbc.com/news", "goal": "Scroll to the bottom of the homepage and click the 'Terms of Use' link in the footer"}
+{"url": "https://www.bbc.com/news", "goal": "Click the 'Menu' button (hamburger icon), then click 'Science' in the expanded menu"}
+{"url": "https://www.bbc.com/news", "goal": "On the Technology page, scroll to the 'Latest updates' section and click the 'Show more' button"}
+{"url": "https://www.bbc.com/news", "goal": "Navigate to https://www.bbc.com/news/world/europe and find the most recent headline published today"}
+{"url": "https://www.bbc.com/news", "goal": "Click on any article thumbnail that displays the 'Analysis' label"}
+{"url": "https://www.bbc.com/news", "goal": "Use the browser's Find function (Ctrl+F) to locate the word 'inflation' on the Business homepage"}
+{"url": "https://www.bbc.com/news", "goal": "Click the 'BBC News' logo in the header to return to the homepage"}
+{"url": "https://www.bbc.com/news", "goal": "On the Sport page, click the 'Olympics' tab and then click the first featured story"}
+{"url": "https://www.bbc.com/news", "goal": "Scroll to a 'Related Topics' sidebar and click the 'Artificial intelligence' link"}
+{"url": "https://www.bbc.com/news", "goal": "Click the 'Weather' link in the global navigation bar (if visible) or footer"}
+{"url": "https://www.bbc.com/news", "goal": "Type 'COP28' into the search bar, press Enter, and scroll down to the third result"}
+{"url": "https://www.bbc.com/news", "goal": "Click on the 'Most Read' section on the homepage and click the second article listed"}
+{"url": "https://www.imdb.com", "goal": "Search for 'The Dark Knight' and click on the top result link"}
+{"url": "https://www.imdb.com", "goal": "Navigate to https://www.imdb.com/chart/top/ and scroll down to view the #50 movie"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Zendaya', then click on her name in the 'Actors & Actresses' section"}
+{"url": "https://www.imdb.com", "goal": "Go to https://www.imdb.com/title/tt0111161/ and find the runtime listed under 'Details'"}
+{"url": "https://www.imdb.com", "goal": "Search for '2023 sci-fi movies', then click the 'Release Date' filter to sort by newest first"}
+{"url": "https://www.imdb.com", "goal": "Navigate to https://www.imdb.com/list/ls000022987/ and scroll to see the 10th title on the list"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Parasite', then click the 'Cast & crew' tab and locate Song Kang-ho's character name"}
+{"url": "https://www.imdb.com", "goal": "Go to https://www.imdb.com/search/title/ and select 'Documentary' from the 'Genres' dropdown, then click 'Submit'"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Christopher Nolan', then click on his profile and find the number of titles he has directed"}
+{"url": "https://www.imdb.com", "goal": "Navigate to https://www.imdb.com/title/tt1234567/ (a non-existent ID) and verify the 'Page not found' message appears"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Inception', then click the 'User reviews' tab and read the headline of the top-rated review"}
+{"url": "https://www.imdb.com", "goal": "Go to https://www.imdb.com/chart/moviemeter/ and click the 'Sort by: Year' button"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Barbie movie 2023', then click on the official title page and locate the MPAA rating"}
+{"url": "https://www.imdb.com", "goal": "Navigate to https://www.imdb.com/interfaces/ and click the 'IMDb Datasets' link"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Ted Lasso', then click on the series and find the 'Years' field under 'Details'"}
+{"url": "https://www.imdb.com", "goal": "Go to https://www.imdb.com/search/name/ and type 'Viola Davis' into the search box, then press Enter"}
+{"url": "https://www.imdb.com", "goal": "Navigate to https://www.imdb.com/title/tt0468569/ and scroll to the 'Box Office' section to find the worldwide gross"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Dune Part Two', then click the 'Release Info' tab and find the US theatrical release date"}
+{"url": "https://www.imdb.com", "goal": "Go to https://www.imdb.com/list/ls070245460/ and click the 'Next' button at the bottom to load page 2"}
+{"url": "https://www.imdb.com", "goal": "Search for 'Studio Ghibli', then click the 'Companies' tab on the results page and find the number of titles associated"}
+{"url": "https://www.espn.com", "goal": "Click on the 'NBA' tab in the top navigation bar"}
+{"url": "https://www.espn.com", "goal": "Type 'LeBron James' into the search bar and press Enter"}
+{"url": "https://www.espn.com", "goal": "Scroll down to the 'Top Stories' section and click on the article titled 'Celtics Extend Winning Streak to 10 Games'"}
+{"url": "https://www.espn.com", "goal": "Navigate to https://www.espn.com/nfl/ and click on the 'Standings' link in the sidebar"}
+{"url": "https://www.espn.com", "goal": "Click on the 'Scores' tab and find the final score of the most recent Lakers vs. Warriors game"}
+{"url": "https://www.espn.com", "goal": "Click on the 'MLB' tab, then click on 'Standings' to view the current American League East standings"}
+{"url": "https://www.espn.com", "goal": "Type '2024 NCAA Tournament' into the search bar and click the first result labeled 'Bracket'"}
+{"url": "https://www.espn.com", "goal": "Navigate to https://www.espn.com/nba/scoreboard/ and locate the game with the highest point total"}
+{"url": "https://www.espn.com", "goal": "Click on the 'Soccer' tab, then click on 'Premier League' to view the latest match results"}
+{"url": "https://www.espn.com", "goal": "Scroll to the bottom of the homepage and click on the 'Terms of Use' link in the footer"}
+{"url": "https://www.espn.com", "goal": "Click on the 'College Football' tab and find the scheduled kickoff time for the Alabama vs. Georgia game this Saturday"}
+{"url": "https://www.espn.com", "goal": "Click on the 'Fantasy' tab, then click on 'Football' to view today's top fantasy waiver wire pickups"}
+{"url": "https://www.espn.com", "goal": "Type 'Kyrie Irving trade' into the search bar and click on the most recent news article"}
+{"url": "https://www.espn.com", "goal": "Navigate to https://www.espn.com/nhl/ and click on the 'Stats' link to view league-leading goal scorers"}
+{"url": "https://www.espn.com", "goal": "Click on the 'Olympics' tab and find the date and time of the next scheduled U.S. men's basketball group stage game"}
+{"url": "https://www.espn.com", "goal": "Scroll down the homepage and click on the video thumbnail labeled 'Highlights: Suns vs. Nuggets Game 7'"}
+{"url": "https://www.espn.com", "goal": "Click on the 'Tennis' tab, then click on 'Australian Open' to view the current women's singles semifinalists"}
+{"url": "https://www.espn.com", "goal": "Use the search bar to look up 'Patrick Mahomes stats' and click on the player stats page"}
+{"url": "https://www.espn.com", "goal": "Navigate to https://www.espn.com/mlb/team/_/name/bos/boston-red-sox and find the starting pitcher for tonight's game"}
+{"url": "https://www.espn.com", "goal": "Click on the 'More Sports' dropdown and select 'Golf' to view the leaderboard from yesterday's PGA Tour event"}
+{"url": "https://arxiv.org", "goal": "Search for 'quantum computing' and click on the first result's title"}
+{"url": "https://arxiv.org", "goal": "Navigate to https://arxiv.org/list/cs.AI/recent and scroll down to view the 5th paper listed"}
+{"url": "https://arxiv.org", "goal": "Click on the 'Help' link in the footer and then click on 'FAQ'"}
+{"url": "https://arxiv.org", "goal": "Search for 'BERT' and filter results to show only papers from 2023 using the year filter"}
+{"url": "https://arxiv.org", "goal": "Navigate to https://arxiv.org/abs/2307.14986 and read the abstract"}
+{"url": "https://arxiv.org", "goal": "Click on the 'Mathematics' subject category link and then click on 'Number Theory'"}
+{"url": "https://arxiv.org", "goal": "Search for 'diffusion models', press Enter, then click the 'PDF' link of the second result"}
+{"url": "https://arxiv.org", "goal": "Navigate to https://arxiv.org/archive/physics and click on 'Physics Education'"}
+{"url": "https://arxiv.org", "goal": "Search for 'reinforcement learning', then click the 'All versions' link next to the top result"}
+{"url": "https://arxiv.org", "goal": "Click on the 'About' link in the header and scroll to the 'Mission' section"}
+{"url": "https://arxiv.org", "goal": "Search for 'LLM alignment' and click on the author name 'Yan Duan' in the first result"}
+{"url": "https://arxiv.org", "goal": "Navigate to https://arxiv.org/corr/ and click on the 'RSS Feeds' link"}
+{"url": "https://arxiv.org", "goal": "Search for 'federated learning', then click the 'arXiv:2203.12123' link in the first result's identifier"}
+{"url": "https://arxiv.org", "goal": "Click on the 'Statistics' subject category and then click on 'Machine Learning' under it"}
+{"url": "https://arxiv.org", "goal": "Search for 'CRISPR gene editing', then click the 'Other formats' link for the third result"}
+{"url": "https://arxiv.org", "goal": "Navigate to https://arxiv.org/subject-areas and locate the 'Computer Science' section"}
+{"url": "https://arxiv.org", "goal": "Search for 'neural radiance fields', press Enter, then click the 'Submit a paper' link in the sidebar"}
+{"url": "https://arxiv.org", "goal": "Click on the 'Contact' link in the footer and read the email address shown"}
+{"url": "https://arxiv.org", "goal": "Search for 'transformer architecture', then click the 'Comments' field of the fourth result to expand it"}
+{"url": "https://arxiv.org", "goal": "Navigate to https://arxiv.org/list/astro-ph.GA/pastweek?show=100 and scroll to the bottom to see the last paper"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'chocolate chip cookies' and click on the first recipe result"}
+{"url": "https://www.allrecipes.com", "goal": "Navigate to https://www.allrecipes.com/recipes/17561/dinner/pasta/ and scroll down to view the third pasta recipe card"}
+{"url": "https://www.allrecipes.com", "goal": "Click on the 'Breakfast & Brunch' category link in the main navigation and then click on the 'Pancakes' subcategory"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'vegan lasagna', then click the 'Dietary' filter and select 'Vegan' to narrow results"}
+{"url": "https://www.allrecipes.com", "goal": "Navigate to a specific recipe page (e.g., https://www.allrecipes.com/recipe/12345/chocolate-cake/) and scroll to read the 'Step 3' instruction"}
+{"url": "https://www.allrecipes.com", "goal": "On any recipe page, click the 'Jump to ingredients' link to scroll directly to the ingredients list"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'air fryer chicken breast', then press Enter and click the 'Cook Time' filter to sort by shortest time"}
+{"url": "https://www.allrecipes.com", "goal": "Navigate to https://www.allrecipes.com/recipes/783/main-dish/ and click the 'Highest Rated' sort option"}
+{"url": "https://www.allrecipes.com", "goal": "On a recipe page with reviews, scroll down and click 'See all reviews' to load additional user feedback"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'gluten-free banana bread', then click the 'Gluten-Free' badge on the first result to confirm dietary label"}
+{"url": "https://www.allrecipes.com", "goal": "Click the 'More' dropdown in the top navigation and select 'Desserts' to go to the desserts category page"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'shakshuka', then click the first result and scroll to find the 'Nutrition' section below the instructions"}
+{"url": "https://www.allrecipes.com", "goal": "Navigate to https://www.allrecipes.com/recipes/94/soups-stews-and-chili/ and click the 'Easy' difficulty filter"}
+{"url": "https://www.allrecipes.com", "goal": "On any recipe page, click the 'Print' button and verify the print-friendly version loads"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'margarita', then click the 'Drinks' category tab above the search results to filter to beverages"}
+{"url": "https://www.allrecipes.com", "goal": "Navigate to https://www.allrecipes.com/recipes/17561/dinner/pasta/ and click the 'Ratings' sort option to see highest-rated pasta recipes first"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'sheet pan dinner', then type 'sweet potato' into the 'Add an ingredient' search box and press Enter"}
+{"url": "https://www.allrecipes.com", "goal": "Click the Allrecipes logo in the header to return to the homepage"}
+{"url": "https://www.allrecipes.com", "goal": "On a recipe page, scroll to the reviews section and read the first reviewer's star rating and comment summary"}
+{"url": "https://www.allrecipes.com", "goal": "Search for 'keto cauliflower rice', then click the 'Keto' filter badge to confirm it's applied to the results"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'New York' city link on the homepage"}
+{"url": "https://www.craigslist.org", "goal": "Type 'guitar' into the search bar and press Enter"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'housing' category link"}
+{"url": "https://www.craigslist.org", "goal": "Scroll down to view the 'for sale' section and click on the 'electronics' subcategory"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'jobs' category, then click on 'customer service' under job types"}
+{"url": "https://www.craigslist.org", "goal": "Navigate to https://newyork.craigslist.org/ and click on the 'resumes' link"}
+{"url": "https://www.craigslist.org", "goal": "Type 'apartment' in the search bar, select 'housing' from the category dropdown, and press Enter"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'services' category, then scroll to and click on 'computer repair'"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'community' category and find the first post titled 'Neighborhood clean-up event'"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'for sale' category, then click on 'free' under the 'price' filter options"}
+{"url": "https://www.craigslist.org", "goal": "Navigate to https://sfbay.craigslist.org/ and click on the 'art' link under 'gigs'"}
+{"url": "https://www.craigslist.org", "goal": "Type 'bicycle' in the search bar, check the 'only show items with images' checkbox, and press Enter"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'housing' category, then click on 'sublets'"}
+{"url": "https://www.craigslist.org", "goal": "Scroll to the bottom of the homepage and click on the 'about' link"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'jobs' category, then click on the 'telecommuting' link"}
+{"url": "https://www.craigslist.org", "goal": "Type 'python developer' in the search bar, select 'jobs' as category, and press Enter"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'housing' category, then click on 'rooms & shares'"}
+{"url": "https://www.craigslist.org", "goal": "Navigate to https://chicago.craigslist.org/ and click on the 'lost+found' link under 'community'"}
+{"url": "https://www.craigslist.org", "goal": "Click on the 'for sale' category, then click on 'antiques'"}
+{"url": "https://www.craigslist.org", "goal": "Type 'used couch' in the search bar, set minimum price to 50 and maximum price to 200, then press Enter"}
+{"url": "https://duckduckgo.com", "goal": "Search for 'quantum computing basics' and press Enter"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'Settings' button in the top-right corner"}
+{"url": "https://duckduckgo.com", "goal": "Scroll down to the 'Instant Answers' section on the homepage and read the description"}
+{"url": "https://duckduckgo.com", "goal": "Type 'weather New York' into the search bar and click the first weather result card"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'Privacy' link in the footer"}
+{"url": "https://duckduckgo.com", "goal": "Search for 'pandas python tutorial' and click the 'Videos' tab"}
+{"url": "https://duckduckgo.com", "goal": "Navigate to https://duckduckgo.com/about and scroll to the 'Our Mission' section"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'DuckDuckHack' link in the footer"}
+{"url": "https://duckduckgo.com", "goal": "Search for 'climate change facts', then click the 'News' tab and read the headline of the top article"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'Images' link in the top navigation bar"}
+{"url": "https://duckduckgo.com", "goal": "Search for 'CSS flexbox guide' and click the 'All Results' link under the 'Web' tab"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'SafeSearch' toggle in Settings to turn it on"}
+{"url": "https://duckduckgo.com", "goal": "Search for 'NASA Mars rover' and click the 'Related topics' link for 'Perseverance rover'"}
+{"url": "https://duckduckgo.com", "goal": "Navigate to https://duckduckgo.com/privacy and find the heading 'What We Don’t Collect'"}
+{"url": "https://duckduckgo.com", "goal": "Type 'define serendipity' and press Enter, then read the definition in the instant answer box"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'Help' link in the footer"}
+{"url": "https://duckduckgo.com", "goal": "Search for 'git cheat sheet', then click the 'Files' tab and click the first PDF result"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'DuckAssist' toggle in Settings to enable it"}
+{"url": "https://duckduckgo.com", "goal": "Search for 'Berlin time' and read the current local time shown in the instant answer"}
+{"url": "https://duckduckgo.com", "goal": "Click the 'Open Source' link in the footer"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'The Midnight Library' and click on the first book result"}
+{"url": "https://www.goodreads.com", "goal": "Navigate to https://www.goodreads.com/author/show/13372086.J_R_R_Tolkien and scroll down to read the 'About the author' section"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'fantasy' in the search bar, press Enter, then click the 'Books' tab"}
+{"url": "https://www.goodreads.com", "goal": "Click on the 'Genres' link in the footer and then click on 'Science Fiction'"}
+{"url": "https://www.goodreads.com", "goal": "Navigate to https://www.goodreads.com/book/show/3735293-to-kill-a-mockingbird and scroll to the 'Community Reviews' section"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'Margaret Atwood', press Enter, then click on her author profile link"}
+{"url": "https://www.goodreads.com", "goal": "Click the 'Lists' link in the top navigation bar, then click 'Popular Lists'"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'nonfiction' and click on the 'Nonfiction' genre tag under 'Refine by Genre'"}
+{"url": "https://www.goodreads.com", "goal": "Navigate to https://www.goodreads.com/genres/mystery and scroll to view the 'Top Books' list"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'Dune' and click on the 1965 edition's 'Details' section to find its original publication year"}
+{"url": "https://www.goodreads.com", "goal": "Click on the 'Explore' dropdown in the header, then select 'Book Recommendations'"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'young adult', press Enter, then click the 'Sort by: Average Rating' dropdown and select 'Most Rated'"}
+{"url": "https://www.goodreads.com", "goal": "Navigate to https://www.goodreads.com/author/show/459345.Sarah_J_Maas and click on the 'Books' tab to see her bibliography"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'The Seven Husbands of Evelyn Hugo', then scroll to the 'Quotes' section and read the first quote"}
+{"url": "https://www.goodreads.com", "goal": "Click on the 'Community' link in the top navigation bar, then click 'Ask the Community'"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'climate change', press Enter, then click the 'Nonfiction' filter under 'Genre'"}
+{"url": "https://www.goodreads.com", "goal": "Navigate to https://www.goodreads.com/book/show/11870085-the-girl-on-the-train and find the average rating displayed next to the star icon"}
+{"url": "https://www.goodreads.com", "goal": "Click the 'Genres' link in the footer, then click 'Romance' and scroll to the 'Recently Added' section"}
+{"url": "https://www.goodreads.com", "goal": "Search for 'book club', press Enter, then click on the list titled 'Best Book Club Picks'"}
+{"url": "https://www.goodreads.com", "goal": "Navigate to https://www.goodreads.com/genres/fantasy and click the 'More Books' button under 'Top Fantasy Books'"}
+{"url": "https://www.weather.gov", "goal": "Type 'New York, NY' into the location search bar and press Enter to view the forecast for New York City"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Radar' link in the top navigation bar to open the national radar map"}
+{"url": "https://www.weather.gov", "goal": "Scroll down to the 'Regional Forecast Maps' section and click the 'Northeast' map thumbnail"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Marine Forecast' link in the footer to navigate to the marine weather page"}
+{"url": "https://www.weather.gov", "goal": "Type '90210' into the location search bar and press Enter to view the forecast for Beverly Hills"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Climate' link in the main navigation menu to go to the climate data page"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Forecast Discussion' link on the current local forecast page to read the meteorologist's analysis"}
+{"url": "https://www.weather.gov", "goal": "Navigate to https://www.weather.gov/phi and scroll down to find the 7-day temperature trend chart"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Aviation Weather' link in the 'Additional Products' section of the homepage"}
+{"url": "https://www.weather.gov", "goal": "Type 'Austin, TX' into the search bar, then click the 'Hourly Weather Graph' tab on the resulting forecast page"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Winter Weather' link under 'Hazards' in the left sidebar of the homepage"}
+{"url": "https://www.weather.gov", "goal": "Click the 'RSS Feeds' link in the footer and locate the 'Current Conditions' feed URL"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Weather Safety' link in the top navigation bar to access safety preparedness resources"}
+{"url": "https://www.weather.gov", "goal": "Type 'Denver, CO' into the location search bar, then click the 'Precipitation Forecast' tab"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Hydrology' link in the 'Additional Products' section to open river and flood forecasts"}
+{"url": "https://www.weather.gov", "goal": "Scroll to the bottom of the homepage and click the 'NWS Social Media' link to view official accounts"}
+{"url": "https://www.weather.gov", "goal": "Click the 'About NWS' link in the footer and scroll to the 'Our Mission' section"}
+{"url": "https://www.weather.gov", "goal": "Type 'Seattle, WA' into the search bar and click the 'Radar' tab on the local forecast page"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Storm Prediction Center' link in the 'National Centers' section of the homepage"}
+{"url": "https://www.weather.gov", "goal": "Click the 'Glossary' link in the footer and locate the definition of 'derecho'"}
+{"url": "https://www.openstreetmap.org", "goal": "Search for 'Eiffel Tower' and click on the search result marker"}
+{"url": "https://www.openstreetmap.org", "goal": "Zoom in twice using the '+' button in the top-left map controls"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Layers' button and select 'Cycle Map' from the dropdown"}
+{"url": "https://www.openstreetmap.org", "goal": "Type 'Central Park' into the search bar and press Enter"}
+{"url": "https://www.openstreetmap.org", "goal": "Scroll down to view the 'About' section at the bottom of the homepage"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Share' button and verify the share dialog appears"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Edit' button and confirm the iD editor welcome screen loads"}
+{"url": "https://www.openstreetmap.org", "goal": "Search for 'Tokyo Station' and click the 'Show me the location' link in the result details"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Export' button and select 'OpenStreetMap XML Data' from the options"}
+{"url": "https://www.openstreetmap.org", "goal": "Type 'Sydney Opera House' in the search bar, then click the blue 'i' icon next to the result"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Permalink' link below the map and verify the URL in the address bar updates"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'GPS traces' layer option in the Layers menu"}
+{"url": "https://www.openstreetmap.org", "goal": "Search for 'Berlin Alexanderplatz' and scroll to see the 'Nearby places' list"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Help' link in the top navigation bar"}
+{"url": "https://www.openstreetmap.org", "goal": "Type 'Mount Fuji' and press Enter, then click the 'View on OSM' link in the search result card"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Map data © OpenStreetMap contributors' link at the bottom of the page"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Developer API' link in the footer"}
+{"url": "https://www.openstreetmap.org", "goal": "Search for 'Statue of Liberty', then click the 'Directions' button in the sidebar"}
+{"url": "https://www.openstreetmap.org", "goal": "Click the 'Print' button and confirm the print preview opens"}
+{"url": "https://www.openstreetmap.org", "goal": "Type 'Canary Wharf' in the search bar, press Enter, then click the 'Wikipedia' link in the place details"}
