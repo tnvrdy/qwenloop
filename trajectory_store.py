@@ -113,6 +113,10 @@ class TrajectoryWriter:
     def set_termination_reason(self, reason: str) -> None:
         self._termination_reason = reason
 
+    def set_goal(self, goal: str) -> None:
+        """Update the goal after trajectory collection (for retroactive labeling)."""
+        self.goal = goal
+
 
     def _write_metadata(self) -> None:
         meta = {
@@ -127,6 +131,21 @@ class TrajectoryWriter:
         self.metadata_path.write_text(
             json.dumps(meta, indent=2, ensure_ascii=False) + "\n"
         )
+
+# post-hoc metadata updates
+
+def update_metadata(traj_dir: str | Path, updates: dict) -> dict:
+    """
+    Merge key-value pairs into an existing trajectory's metadata.json.
+    Returns the updated metadata dict.
+    """
+    traj_dir = Path(traj_dir)
+    meta_path = traj_dir / "metadata.json"
+    meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+    meta.update(updates)
+    meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n")
+    return meta
+
 
 # load/read trajectories (for judge, decomposer)
 
