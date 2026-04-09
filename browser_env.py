@@ -227,18 +227,22 @@ class BrowserEnv:
 
     # text observations
 
-    def _list_interactive_locators(self) -> List[Locator]:
-        root = self.page.locator(_INTERACTIVE_SELECTOR)
-        n = root.count()
-        return [root.nth(i) for i in range(n)]
-
-    def _describe_all_locators(self) -> list[str]:
-        """Single page.evaluate() call to describe every interactive element."""
+    def _collect_visible_elements(self) -> tuple[list[int], list[str]]:
+        """
+        Single JS call: find all interactive elements, filter to only visible
+        ones, return (indices_into_querySelectorAll, descriptions).
+        """
         try:
-            return self.page.evaluate(
+            results = self.page.evaluate(
                 """(selector) => {
                     const els = Array.from(document.querySelectorAll(selector));
-                    return els.map(el => {
+                    const out = [];
+                    for (let i = 0; i < els.length; i++) {
+                        const el = els[i];
+                        const r = el.getBoundingClientRect();
+                        if (r.width === 0 && r.height === 0) continue;
+                        if (el.offsetParent === null && getComputedStyle(el).position !== 'fixed') continue;
+
                         const tag = el.tagName.toLowerCase();
                         const type = el.getAttribute('type') || '';
                         const role = el.getAttribute('role') || '';
@@ -250,18 +254,22 @@ class BrowserEnv:
                         const bits = [tag + (type ? '[' + type + ']' : '')];
                         if (role) bits.push('role=' + role);
                         const label = [al, placeholder, name, text].find(s => s && s.length);
-                        return bits.join(' ') + (label ? ' | ' + label : '');
-                    });
+                        out.push({idx: i, desc: bits.join(' ') + (label ? ' | ' + label : '')});
+                    }
+                    return out;
                 }""",
                 _INTERACTIVE_SELECTOR,
             )
         except Exception:
-            return []
+            return [], []
+        indices = [r["idx"] for r in results]
+        descs = [r["desc"] for r in results]
+        return indices, descs
 
     def get_text_observation(self, max_chars: int = 16_000) -> Observation:
         """
         Build a text snapshot of the current page for the LLM prompt:
-        URL, title, then numbered interactive elements.
+        URL, title, then numbered interactive elements (visible only).
         """
         self._wait_settled()
 
@@ -270,13 +278,15 @@ class BrowserEnv:
         except Exception:
             title = "(loading...)"
 
-        self._last_interactive_locators = self._list_interactive_locators()
-        descs = self._describe_all_locators()
+        visible_indices, descs = self._collect_visible_elements()
+
+        root = self.page.locator(_INTERACTIVE_SELECTOR)
+        self._last_interactive_locators = [root.nth(i) for i in visible_indices]
 
         lines = [
             f"URL: {self.page.url}",
             f"Title: {title}",
-            f"Interactive elements: {len(self._last_interactive_locators)}",
+            f"Interactive elements: {len(descs)}",
             "",
         ]
         for i, desc in enumerate(descs):
