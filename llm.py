@@ -11,7 +11,6 @@ Env vars:
 from __future__ import annotations
 
 import os
-from typing import Optional
 
 from openai import OpenAI
 
@@ -21,6 +20,15 @@ OPENAI_BASE_URL = "https://api.openai.com/v1"
 
 QWEN_DEFAULT_MODEL = "qwen-plus"
 OPENAI_DEFAULT_MODEL = "gpt-4o-mini"
+
+_client_cache: dict[tuple[str, str], OpenAI] = {}
+
+
+def _get_client(base_url: str, api_key: str) -> OpenAI:
+    key = (base_url, api_key)
+    if key not in _client_cache:
+        _client_cache[key] = OpenAI(api_key=api_key, base_url=base_url)
+    return _client_cache[key]
 
 
 def chat(
@@ -36,15 +44,13 @@ def chat(
     Send messages and return the assistant's reply as a plain string.
 
     Args:
-        messages: List of chat messages in OpenAI format, e.g. [{"role": "system", "content": "..."},
-                     {"role": "user", "content": "..."}]
-        model: Model name. Pass to override [QWEN, OPENAI]_DEFAULT_MODEL constant
-        temperature: 0.7 to create variety for an exploration policy, can raise?
-        max_tokens: Budget for the reply, pass or default to 256
-        provider: "qwen" or "openai". Pass or default to "qwen"
-        base_url: Pass to override [OPENAI, DASHSCOPE]_BASE_URL constant API endpoint 
-                  (e.g. if you want to use dashscope's intl endpoint instead of US)
-        api_key: Pass to override [OPENAI, QWEN]_API_KEY env var
+        messages: List of chat messages in OpenAI format.
+        model: Override the default model for the chosen provider.
+        temperature: Sampling temperature (0.7 default for exploration diversity).
+        max_tokens: Budget for the reply.
+        provider: "qwen" or "openai".
+        base_url: Override the default API endpoint.
+        api_key: Override the env-var API key.
     """
     if provider == "qwen":
         resolved_key = api_key or os.environ["QWEN_API_KEY"]
@@ -55,7 +61,7 @@ def chat(
         resolved_url = base_url or OPENAI_BASE_URL
         resolved_model = model or OPENAI_DEFAULT_MODEL
 
-    client = OpenAI(api_key=resolved_key, base_url=resolved_url)
+    client = _get_client(resolved_url, resolved_key)
 
     response = client.chat.completions.create(
         model=resolved_model,
