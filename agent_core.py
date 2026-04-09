@@ -41,12 +41,17 @@ interact with the page, explore content in depth. Act naturally and purposefully
 Do NOT just scroll repeatedly or click randomly. Each action should reflect genuine \
 human curiosity or intent.
 
+IMPORTANT: Stay on the current website. Do NOT use goto to navigate to a different \
+domain. Explore the site you are already on by clicking links, using search features, \
+interacting with page elements, and navigating its internal pages.
+
 {ACTION_VOCABULARY}
 
 Rules:
 1. Output EXACTLY ONE action per reply, on a single line. Nothing else — no explanation, no preamble.
 2. Use only the actions listed above. Any other output will be treated as a parse error.
-3. Do NOT output stop — keep exploring for the full session.""".strip()
+3. Do NOT output stop — keep exploring for the full session.
+4. Do NOT use goto to leave the current site's domain.""".strip()
 
 
 def _build_user_message(
@@ -112,6 +117,8 @@ def run_steps(
     system_msg = {"role": "system", "content": system_prompt}
     action_history: list[str] = []
     consecutive_failures = 0
+    consecutive_repeats = 0
+    last_action: str | None = None
 
     for step_num in range(max_steps):
         obs = env.get_text_observation()
@@ -123,6 +130,12 @@ def run_steps(
         raw_full = chat([system_msg, user_msg], model=model)
         raw = _first_line(raw_full)
         print(f"  [step {step_num}] model: {raw}")
+
+        if raw == last_action:
+            consecutive_repeats += 1
+        else:
+            consecutive_repeats = 0
+        last_action = raw
 
         parsed = None
         parse_error: str | None = None
@@ -171,5 +184,8 @@ def run_steps(
             return "stop"
         if consecutive_failures >= 3:
             return "consecutive_failures"
+        if consecutive_repeats >= 2:
+            print(f"  [step {step_num}] stuck: repeated {raw!r} 3 times")
+            return "stuck"
 
     return "max_steps"
