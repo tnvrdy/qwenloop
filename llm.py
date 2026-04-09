@@ -11,8 +11,14 @@ Env vars:
 from __future__ import annotations
 
 import os
+import random
+import time
 
+import openai
 from openai import OpenAI
+
+_RETRYABLE = (openai.RateLimitError, openai.APIConnectionError,
+              openai.APITimeoutError, openai.InternalServerError)
 
 
 DASHSCOPE_BASE_URL = "https://dashscope-us.aliyuncs.com/compatible-mode/v1"
@@ -63,13 +69,25 @@ def chat(
 
     client = _get_client(resolved_url, resolved_key)
 
-    response = client.chat.completions.create(
-        model=resolved_model,
-        messages=messages,
-        temperature=temperature,
-        max_tokens=max_tokens,
-    )
-    return response.choices[0].message.content or ""
+    delay = 2.0
+    MAX_ATTEMPTS = 4
+    for attempt in range(MAX_ATTEMPTS):
+        try:
+            response = client.chat.completions.create(
+                model=resolved_model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+            )
+            return response.choices[0].message.content or ""
+        except _RETRYABLE as e:
+            if attempt == MAX_ATTEMPTS - 1:
+                raise
+            jitter = random.uniform(0, 0.5)
+            print(f"[llm] {type(e).__name__}, retry {attempt+1}/3 in {delay+jitter:.1f}s")
+            time.sleep(delay + jitter)
+            delay *= 2
+    return ""
 
 
 if __name__ == "__main__":
