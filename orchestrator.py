@@ -20,7 +20,7 @@ def _run_task_batch(tasks, trajectories_dir, model, max_steps):
     try:
         from agent_goaldirected import run_task_batch
         results = run_task_batch(tasks, trajectories_dir=trajectories_dir,
-                                 model=model, max_steps=max_steps, headless=True)
+                                 model=model, max_steps=max_steps, headless=False)
         ok = [r for r in results if r["status"] == "ok"]
         return {
             "status": "ok",
@@ -37,7 +37,7 @@ def _run_freeform(seed_url, num_episodes, trajectories_dir, model, max_steps):
         from agent_freeform import run_freeform_session
         traj_dirs = run_freeform_session(seed_url=seed_url, num_episodes=num_episodes,
                                           trajectories_dir=trajectories_dir, model=model,
-                                          max_steps=max_steps, headless=True)
+                                          max_steps=max_steps, headless=False)
         from trajectory_store import load_trajectory
         meaningful = sum(
             1 for td in traj_dirs
