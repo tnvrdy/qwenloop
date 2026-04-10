@@ -13,6 +13,8 @@ from __future__ import annotations
 import os
 import random
 import time
+from datetime import datetime, timezone
+from pathlib import Path
 
 import openai
 from openai import OpenAI
@@ -69,8 +71,10 @@ def chat(
 
     client = _get_client(resolved_url, resolved_key)
 
+    _acquire_rate_limit_slot()
+
     delay = 2.0
-    MAX_ATTEMPTS = 4
+    MAX_ATTEMPTS = int(os.environ.get("LLM_MAX_ATTEMPTS", "4"))
     for attempt in range(MAX_ATTEMPTS):
         try:
             response = client.chat.completions.create(
@@ -82,10 +86,27 @@ def chat(
             return response.choices[0].message.content or ""
         except _RETRYABLE as e:
             if attempt == MAX_ATTEMPTS - 1:
+                _emit_retry_telemetry(
+                    event="retry_exhausted",
+                    model=resolved_model,
+                    provider=provider,
+                    attempt=attempt + 1,
+                    error_type=type(e).__name__,
+                    sleep_seconds=0.0,
+                )
                 raise
             jitter = random.uniform(0, 0.5)
-            print(f"[llm] {type(e).__name__}, retry {attempt+1}/3 in {delay+jitter:.1f}s")
-            time.sleep(delay + jitter)
+            sleep_s = delay + jitter
+            _emit_retry_telemetry(
+                event="retry",
+                model=resolved_model,
+                provider=provider,
+                attempt=attempt + 1,
+                error_type=type(e).__name__,
+                sleep_seconds=sleep_s,
+            )
+            print(f"[llm] {type(e).__name__}, retry {attempt + 1}/{MAX_ATTEMPTS} in {sleep_s:.1f}s")
+            time.sleep(sleep_s)
             delay *= 2
     return ""
 
@@ -99,3 +120,78 @@ if __name__ == "__main__":
         max_tokens=32,
     )
     print(repr(reply))
+
+
+def _acquire_rate_limit_slot() -> None:
+    qps_raw = os.environ.get("LLM_RATE_LIMIT_QPS", "").strip()
+    if not qps_raw:
+        return
+    try:
+        qps = float(qps_raw)
+    except ValueError:
+        return
+    if qps <= 0:
+        return
+
+    state_path = Path(os.environ.get("LLM_RATE_LIMIT_STATE_FILE", "/tmp/qwenloop_llm_rate_limit.state"))
+    lock_path = state_path.with_suffix(state_path.suffix + ".lock")
+    now = time.time()
+    min_interval = 1.0 / qps
+
+    with open(lock_path, "a+", encoding="utf-8") as lock_f:
+        try:
+            import fcntl
+            fcntl.flock(lock_f.fileno(), fcntl.LOCK_EX)
+        except Exception:
+            pass
+
+        last_ts = 0.0
+        if state_path.exists():
+            try:
+                last_ts = float(state_path.read_text(encoding="utf-8").strip())
+            except Exception:
+                last_ts = 0.0
+
+        wait_s = max(0.0, (last_ts + min_interval) - now)
+        if wait_s > 0:
+            time.sleep(wait_s)
+            now = time.time()
+        state_path.write_text(f"{now:.6f}", encoding="utf-8")
+
+        try:
+            import fcntl
+            fcntl.flock(lock_f.fileno(), fcntl.LOCK_UN)
+        except Exception:
+            pass
+
+
+def _emit_retry_telemetry(
+    *,
+    event: str,
+    model: str,
+    provider: str,
+    attempt: int,
+    error_type: str,
+    sleep_seconds: float,
+) -> None:
+    path_raw = os.environ.get("LLM_RETRY_TELEMETRY_FILE", "").strip()
+    if not path_raw:
+        return
+    row = {
+        "ts": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "event": event,
+        "provider": provider,
+        "model": model,
+        "attempt": attempt,
+        "error_type": error_type,
+        "sleep_seconds": round(sleep_seconds, 3),
+    }
+    path = Path(path_raw)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "a", encoding="utf-8") as f:
+        f.write(json_dumps(row) + "\n")
+
+
+def json_dumps(obj: dict) -> str:
+    import json
+    return json.dumps(obj, ensure_ascii=False)
