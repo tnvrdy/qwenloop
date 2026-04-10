@@ -11,11 +11,12 @@ Usage:
 from __future__ import annotations
 
 import sys
+import time
 from pathlib import Path
 
 from agent_core import run_steps
 from browser_env import BrowserEnv
-from trajectory_store import TrajectoryWriter
+from trajectory_store import TrajectoryWriter, load_trajectory
 
 
 def run_exploration_episode(
@@ -25,15 +26,35 @@ def run_exploration_episode(
     model: str | None = None,
     max_steps: int = 4,
     headless: bool = True,
+    writer_flush_every: int = 1,
+    writer_async: bool = False,
+    writer_queue_size: int = 256,
+    compress_heavy: bool = False,
+    include_raw_model_output: bool = False,
 ) -> Path:
     """Run one episode with its own browser. Fine for testing, not for scale."""
     with (
         BrowserEnv(headless=headless) as env,
-        TrajectoryWriter(trajectories_dir, goal=goal, start_url=url) as tw,
+        TrajectoryWriter(
+            trajectories_dir,
+            goal=goal,
+            start_url=url,
+            flush_every=writer_flush_every,
+            async_writer=writer_async,
+            queue_size=writer_queue_size,
+            compress_heavy=compress_heavy,
+        ) as tw,
     ):
         env.goto(url)
         print(f"[episode] goal={goal!r}  url={url}")
-        reason = run_steps(env, tw, goal=goal, model=model, max_steps=max_steps)
+        reason = run_steps(
+            env,
+            tw,
+            goal=goal,
+            model=model,
+            max_steps=max_steps,
+            include_raw_model_output=include_raw_model_output,
+        )
         tw.set_termination_reason(reason)
         print(f"[episode] done ({reason})")
         return tw.traj_dir
@@ -45,6 +66,11 @@ def run_task_batch(
     model: str | None = None,
     max_steps: int = 4,
     headless: bool = True,
+    writer_flush_every: int = 1,
+    writer_async: bool = False,
+    writer_queue_size: int = 256,
+    compress_heavy: bool = False,
+    include_raw_model_output: bool = False,
 ) -> list[dict]:
     """
     Run a batch of (url, goal) tasks on a single persistent browser.
@@ -63,19 +89,38 @@ def run_task_batch(
                 env.goto(url)
                 print(f"[batch {i + 1}/{len(tasks)}] goal={goal!r}  url={url}")
 
-                with TrajectoryWriter(trajectories_dir, goal=goal, start_url=url) as tw:
-                    reason = run_steps(env, tw, goal=goal, model=model, max_steps=max_steps)
+                ep_start = time.perf_counter()
+                with TrajectoryWriter(
+                    trajectories_dir,
+                    goal=goal,
+                    start_url=url,
+                    flush_every=writer_flush_every,
+                    async_writer=writer_async,
+                    queue_size=writer_queue_size,
+                    compress_heavy=compress_heavy,
+                ) as tw:
+                    reason = run_steps(
+                        env,
+                        tw,
+                        goal=goal,
+                        model=model,
+                        max_steps=max_steps,
+                        include_raw_model_output=include_raw_model_output,
+                    )
                     tw.set_termination_reason(reason)
                     traj_dir = tw.traj_dir
 
-                from trajectory_store import load_trajectory
-                meta = load_trajectory(traj_dir)["metadata"]
+                elapsed_s = time.perf_counter() - ep_start
+                meta = load_trajectory(traj_dir, include_heavy=False)["metadata"]
 
                 results.append({
                     "status": "ok",
                     "trajectory_id": meta.get("trajectory_id", traj_dir.name),
                     "num_steps": meta.get("num_steps", 0),
                     "termination_reason": meta.get("termination_reason", "unknown"),
+                    "elapsed_seconds": round(elapsed_s, 3),
+                    "bytes_written": _dir_size_bytes(traj_dir),
+                    "runtime_metrics": meta.get("runtime_metrics", {}),
                 })
                 print(f"[batch {i + 1}/{len(tasks)}] done ({reason})")
 
@@ -89,6 +134,14 @@ def run_task_batch(
                 print(f"[batch {i + 1}/{len(tasks)}] ERROR: {e}")
 
     return results
+
+
+def _dir_size_bytes(path: Path) -> int:
+    total = 0
+    for p in path.rglob("*"):
+        if p.is_file():
+            total += p.stat().st_size
+    return total
 
 
 if __name__ == "__main__":

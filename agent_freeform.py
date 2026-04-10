@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from pathlib import Path
 
 from agent_core import run_steps
@@ -141,6 +142,12 @@ def run_freeform_session(
     model: str | None = None,
     max_steps: int = 8,
     headless: bool = True,
+    label_mode: str = "deferred",
+    writer_flush_every: int = 1,
+    writer_async: bool = False,
+    writer_queue_size: int = 256,
+    compress_heavy: bool = False,
+    include_raw_model_output: bool = False,
 ) -> list[Path]:
     """
     Run a continuous freeform exploration session.
@@ -172,31 +179,66 @@ def run_freeform_session(
                 trajectories_dir,
                 goal="(unlabeled)",
                 start_url=current_url,
+                flush_every=writer_flush_every,
+                async_writer=writer_async,
+                queue_size=writer_queue_size,
+                compress_heavy=compress_heavy,
             ) as tw:
+                ep_start = time.perf_counter()
                 reason = run_steps(
-                    env, tw,
+                    env,
+                    tw,
                     goal=None,
                     model=model,
                     max_steps=max_steps,
+                    include_raw_model_output=include_raw_model_output,
                 )
+                tw.add_metadata({"collection_elapsed_seconds": round(time.perf_counter() - ep_start, 3)})
                 tw.set_termination_reason(reason)
                 traj_dirs.append(tw.traj_dir)
                 traj_path = tw.traj_dir
 
-            print(f"[freeform ep {ep + 1}/{num_episodes}] exploration done ({reason}), labeling ...")
-
-            label = label_trajectory(traj_path, model=model)
-            if label["meaningful"]:
-                meaningful_count += 1
-                print(f"[freeform ep {ep + 1}/{num_episodes}] MEANINGFUL: {label['goal']!r}")
+            if label_mode == "inline":
+                print(f"[freeform ep {ep + 1}/{num_episodes}] exploration done ({reason}), labeling ...")
+                label = label_trajectory(traj_path, model=model)
+                if label["meaningful"]:
+                    meaningful_count += 1
+                    print(f"[freeform ep {ep + 1}/{num_episodes}] MEANINGFUL: {label['goal']!r}")
+                else:
+                    print(f"[freeform ep {ep + 1}/{num_episodes}] not meaningful, kept as (unlabeled)")
             else:
-                print(f"[freeform ep {ep + 1}/{num_episodes}] not meaningful, kept as (unlabeled)")
+                print(f"[freeform ep {ep + 1}/{num_episodes}] exploration done ({reason}), labeling deferred")
 
             print(f"[freeform ep {ep + 1}/{num_episodes}] now at {env.page.url}\n")
 
-    print(f"[freeform] session complete: {len(traj_dirs)} trajectories, "
-          f"{meaningful_count} meaningful")
+    if label_mode == "inline":
+        print(f"[freeform] session complete: {len(traj_dirs)} trajectories, "
+              f"{meaningful_count} meaningful")
+    else:
+        print(f"[freeform] session complete: {len(traj_dirs)} trajectories, labeling not run inline")
     return traj_dirs
+
+
+def label_trajectories_batch(
+    traj_dirs: list[str | Path],
+    model: str | None = None,
+) -> dict:
+    meaningful = 0
+    errors = 0
+    for i, td in enumerate(traj_dirs):
+        try:
+            result = label_trajectory(td, model=model)
+            if result.get("meaningful"):
+                meaningful += 1
+            print(f"[label {i + 1}/{len(traj_dirs)}] {Path(td).name}: {'meaningful' if result.get('meaningful') else 'unlabeled'}")
+        except Exception as e:
+            errors += 1
+            print(f"[label {i + 1}/{len(traj_dirs)}] {Path(td).name}: ERROR {e}")
+    return {
+        "total": len(traj_dirs),
+        "meaningful": meaningful,
+        "errors": errors,
+    }
 
 
 if __name__ == "__main__":
@@ -209,6 +251,12 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output", default="trajectories", help="Output directory")
     parser.add_argument("--model", default=None, help="LLM model override")
     parser.add_argument("--headed", action="store_true", help="Run in headed mode (visible browser)")
+    parser.add_argument(
+        "--label-mode",
+        choices=["inline", "deferred"],
+        default="deferred",
+        help="inline = label right after each episode; deferred = collect only",
+    )
     args = parser.parse_args()
 
     dirs = run_freeform_session(
@@ -218,10 +266,14 @@ if __name__ == "__main__":
         model=args.model,
         max_steps=args.max_steps,
         headless=not args.headed,
+        label_mode=args.label_mode,
     )
 
-    print(f"\nTrajectories saved:")
-    for d in dirs:
-        meta = json.loads((d / "metadata.json").read_text())
-        tag = "✓" if meta.get("label_result", {}).get("meaningful") else "·"
-        print(f"  {tag} {d.name}  goal={meta.get('goal', '?')!r}")
+    if args.label_mode == "deferred":
+        print("\nLabeling deferred; run label_trajectories_batch(...) or orchestrator --label-freeform.")
+    else:
+        print(f"\nTrajectories saved:")
+        for d in dirs:
+            meta = json.loads((d / "metadata.json").read_text())
+            tag = "✓" if meta.get("label_result", {}).get("meaningful") else "·"
+            print(f"  {tag} {d.name}  goal={meta.get('goal', '?')!r}")
