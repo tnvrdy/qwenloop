@@ -18,6 +18,7 @@ from pathlib import Path
 
 from collection_config import CollectionIOConfig, resolve_io_config
 from io_utils import dir_size_bytes
+from agent_goaldirected import _validate_max_steps
 
 
 def _run_task_batch(
@@ -129,7 +130,7 @@ def run_tasks(
     tasks_path: str | Path,
     trajectories_dir: str | Path = "trajectories",
     max_workers: int = 4,
-    max_steps: int = 4,
+    max_steps: int = 25,
     model: str | None = None,
     limit: int | None = None,
     headless: bool = True,
@@ -145,6 +146,7 @@ def run_tasks(
     Supports task-driven, freeform, or mixed mode.
     """
     trajectories_dir = str(Path(trajectories_dir).resolve())
+    max_steps = _validate_max_steps(max_steps)
     if llm_qps is not None:
         os.environ["LLM_RATE_LIMIT_QPS"] = str(llm_qps)
         os.environ.setdefault("LLM_RETRY_TELEMETRY_FILE", str(Path(trajectories_dir) / "llm_retry_telemetry.jsonl"))
@@ -213,6 +215,11 @@ def run_tasks(
         "avg_step_latency_ms": round(sum(lat_samples) / len(lat_samples), 2) if lat_samples else None,
         "p95_step_latency_ms": _p95(lat_samples),
     }
+    try:
+        from judge import summarize_collection_quality
+        summary["quality_report"] = summarize_collection_quality(trajectories_dir)
+    except Exception:
+        summary["quality_report"] = None
     sp = _write_summary(summary, trajectories_dir)
 
     print(f"\n{'=' * 50}")
@@ -228,7 +235,7 @@ def run_freeform(
     trajectories_dir: str | Path = "trajectories",
     max_workers: int = 4,
     episodes_per_worker: int = 5,
-    max_steps: int = 8,
+    max_steps: int = 30,
     model: str | None = None,
     seeds: list[str] | None = None,
     headless: bool = True,
@@ -241,6 +248,7 @@ def run_freeform(
     llm_qps: float | None = None,
 ) -> dict:
     trajectories_dir = str(Path(trajectories_dir).resolve())
+    max_steps = _validate_max_steps(max_steps)
     if llm_qps is not None:
         os.environ["LLM_RATE_LIMIT_QPS"] = str(llm_qps)
         os.environ.setdefault("LLM_RETRY_TELEMETRY_FILE", str(Path(trajectories_dir) / "llm_retry_telemetry.jsonl"))
@@ -317,6 +325,11 @@ def run_freeform(
         "write_mb_per_second": round((total_bytes / (1024 * 1024)) / elapsed, 2) if elapsed > 0 else 0,
         "labeling": label_summary,
     }
+    try:
+        from judge import summarize_collection_quality
+        summary["quality_report"] = summarize_collection_quality(trajectories_dir)
+    except Exception:
+        summary["quality_report"] = None
     sp = _write_summary(summary, trajectories_dir)
 
     print(f"\n{'=' * 50}")
@@ -344,7 +357,7 @@ if __name__ == "__main__":
     tp.add_argument("tasks_file", help="Path to tasks JSONL")
     tp.add_argument("-o", "--output", default="trajectories")
     tp.add_argument("-w", "--workers", type=int, default=4)
-    tp.add_argument("--max-steps", type=int, default=4)
+    tp.add_argument("--max-steps", type=int, default=25)
     tp.add_argument("--model", default=None)
     tp.add_argument("--limit", type=int, default=None)
     tp.add_argument("--headed", action="store_true")
@@ -361,7 +374,7 @@ if __name__ == "__main__":
     fp.add_argument("-o", "--output", default="trajectories")
     fp.add_argument("-w", "--workers", type=int, default=4)
     fp.add_argument("--episodes", type=int, default=5, help="Episodes per worker")
-    fp.add_argument("--max-steps", type=int, default=8)
+    fp.add_argument("--max-steps", type=int, default=30)
     fp.add_argument("--model", default=None)
     fp.add_argument("--headed", action="store_true")
     fp.add_argument("--label-freeform", action="store_true", help="Run freeform labeling after collection")
