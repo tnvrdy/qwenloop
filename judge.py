@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
 from llm import chat
@@ -161,6 +162,7 @@ def judge_all_trajectories(
     threshold: int = 3,
     model: str | None = None,
     force: bool = False,
+    max_workers: int = 1,
 ) -> dict:
     """
     Judge all trajectories under base_dir. Skips already-judged trajectories unless force=True.
@@ -182,24 +184,47 @@ def judge_all_trajectories(
     trajs = list(iter_trajectories(base_dir))
     print(f"Judging {len(trajs)} trajectories in {base_dir}")
 
-    for i, (traj_id, traj_path) in enumerate(trajs):
+    pending = []
+    for traj_id, traj_path in trajs:
         result_path = traj_path / JUDGE_RESULT_FILE
-
         if result_path.exists() and not force:
             skipped += 1
             continue
+        pending.append((traj_id, traj_path))
 
-        total += 1
-        try:
-            result = judge_trajectory(traj_path, threshold=threshold, model=model)
-            if result["pass"]:
-                passed += 1
-            else:
-                failed += 1
-            print(f"  [{i + 1}/{len(trajs)}] {traj_id}: score={result['score']} {'PASS' if result['pass'] else 'FAIL'}")
-        except Exception as e:
-            errors += 1
-            print(f"  [{i + 1}/{len(trajs)}] {traj_id}: ERROR {e}")
+    total = len(pending)
+    if max_workers <= 1:
+        for i, (traj_id, traj_path) in enumerate(pending):
+            try:
+                result = judge_trajectory(traj_path, threshold=threshold, model=model)
+                if result["pass"]:
+                    passed += 1
+                else:
+                    failed += 1
+                print(f"  [{i + 1}/{len(pending)}] {traj_id}: score={result['score']} {'PASS' if result['pass'] else 'FAIL'}")
+            except Exception as e:
+                errors += 1
+                print(f"  [{i + 1}/{len(pending)}] {traj_id}: ERROR {e}")
+    else:
+        with ProcessPoolExecutor(max_workers=max_workers) as pool:
+            futures = {
+                pool.submit(judge_trajectory, traj_path, threshold, model): traj_id
+                for traj_id, traj_path in pending
+            }
+            done = 0
+            for future in as_completed(futures):
+                done += 1
+                traj_id = futures[future]
+                try:
+                    result = future.result()
+                    if result["pass"]:
+                        passed += 1
+                    else:
+                        failed += 1
+                    print(f"  [{done}/{len(pending)}] {traj_id}: score={result['score']} {'PASS' if result['pass'] else 'FAIL'}")
+                except Exception as e:
+                    errors += 1
+                    print(f"  [{done}/{len(pending)}] {traj_id}: ERROR {e}")
 
     summary = {
         "total_judged": total,
@@ -223,6 +248,7 @@ if __name__ == "__main__":
     parser.add_argument("--threshold", type=int, default=3, help="Minimum score to pass (1-5)")
     parser.add_argument("--model", default=None, help="LLM model override")
     parser.add_argument("--force", action="store_true", help="Re-judge already-judged trajectories")
+    parser.add_argument("--max-workers", type=int, default=1, help="Parallel judge workers")
     args = parser.parse_args()
 
     judge_all_trajectories(
@@ -230,4 +256,5 @@ if __name__ == "__main__":
         threshold=args.threshold,
         model=args.model,
         force=args.force,
+        max_workers=args.max_workers,
     )
