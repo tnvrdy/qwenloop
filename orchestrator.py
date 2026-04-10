@@ -18,7 +18,7 @@ from pathlib import Path
 
 from collection_config import CollectionIOConfig, resolve_io_config
 from io_utils import dir_size_bytes
-from agent_goaldirected import _validate_max_steps
+from agent.agent_goaldirected import _validate_max_steps
 
 
 def _run_task_batch(
@@ -30,7 +30,7 @@ def _run_task_batch(
     io_config: CollectionIOConfig,
 ):
     try:
-        from agent_goaldirected import run_task_batch
+        from agent.agent_goaldirected import run_task_batch
         results = run_task_batch(
             tasks,
             trajectories_dir=trajectories_dir,
@@ -69,7 +69,7 @@ def _run_freeform(
     io_config: CollectionIOConfig,
 ):
     try:
-        from agent_freeform import run_freeform_session
+        from agent.agent_freeform import run_freeform_session
         traj_dirs = run_freeform_session(
             seed_url=seed_url,
             num_episodes=num_episodes,
@@ -261,7 +261,7 @@ def run_freeform(
         include_raw_model_output=include_raw_model_output,
     )
     if seeds is None:
-        from task_generator import DEFAULT_SEEDS
+        from task_generation.task_generator import DEFAULT_SEEDS
         seeds = [s["url"] for s in DEFAULT_SEEDS]
 
     print(f"Orchestrator: {max_workers} freeform workers, {episodes_per_worker} episodes each")
@@ -307,7 +307,7 @@ def run_freeform(
 
     label_summary = None
     if label_freeform and all_traj_dirs:
-        from agent_freeform import label_trajectories_batch
+        from agent.agent_freeform import label_trajectories_batch
         print("\nRunning deferred freeform labeling...")
         label_summary = label_trajectories_batch(all_traj_dirs, model=model)
         total_meaningful = label_summary["meaningful"]
