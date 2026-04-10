@@ -21,7 +21,6 @@ import json
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-from llm import chat
 from trajectory_store import iter_trajectories, load_trajectory
 
 
@@ -136,6 +135,8 @@ def judge_trajectory(
         steps_text=steps_text,
     )
 
+    from llm import chat
+
     response = chat(
         messages=[{"role": "user", "content": prompt}],
         model=model,
@@ -237,6 +238,52 @@ def judge_all_trajectories(
     return summary
 
 
+def summarize_collection_quality(base_dir: str | Path) -> dict:
+    """
+    Summarize trajectory quality signals without running new judge calls.
+    Uses existing metadata + judge_result.json (if present).
+    """
+    base_dir = Path(base_dir)
+    total = 0
+    total_steps = 0
+    terminations: dict[str, int] = {}
+    by_source: dict[str, dict[str, int]] = {}
+
+    for _, traj_path in iter_trajectories(base_dir):
+        total += 1
+        traj = load_trajectory(traj_path, include_heavy=False)
+        meta = traj.get("metadata", {})
+        steps = int(meta.get("num_steps", 0) or 0)
+        total_steps += steps
+        reason = meta.get("termination_reason", "unknown")
+        terminations[reason] = terminations.get(reason, 0) + 1
+
+        source = meta.get("seed_source", "unknown")
+        bucket = by_source.setdefault(source, {"count": 0, "judged": 0, "passed": 0})
+        bucket["count"] += 1
+
+        jr_path = traj_path / JUDGE_RESULT_FILE
+        if jr_path.exists():
+            try:
+                jr = json.loads(jr_path.read_text())
+                bucket["judged"] += 1
+                if bool(jr.get("pass")):
+                    bucket["passed"] += 1
+            except Exception:
+                pass
+
+    for bucket in by_source.values():
+        judged = bucket["judged"]
+        bucket["pass_rate"] = round(bucket["passed"] / judged, 3) if judged else None
+
+    return {
+        "total_trajectories": total,
+        "avg_steps": round(total_steps / total, 2) if total else 0.0,
+        "termination_mix": terminations,
+        "by_source": by_source,
+    }
+
+
 def _write_result(traj_dir: Path, result: dict) -> None:
     path = traj_dir / JUDGE_RESULT_FILE
     path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n")
@@ -249,12 +296,17 @@ if __name__ == "__main__":
     parser.add_argument("--model", default=None, help="LLM model override")
     parser.add_argument("--force", action="store_true", help="Re-judge already-judged trajectories")
     parser.add_argument("--max-workers", type=int, default=1, help="Parallel judge workers")
+    parser.add_argument("--report-only", action="store_true", help="Only print quality report from metadata/judge_result")
     args = parser.parse_args()
 
-    judge_all_trajectories(
-        args.trajectories_dir,
-        threshold=args.threshold,
-        model=args.model,
-        force=args.force,
-        max_workers=args.max_workers,
-    )
+    if args.report_only:
+        report = summarize_collection_quality(args.trajectories_dir)
+        print(json.dumps(report, indent=2, ensure_ascii=False))
+    else:
+        judge_all_trajectories(
+            args.trajectories_dir,
+            threshold=args.threshold,
+            model=args.model,
+            force=args.force,
+            max_workers=args.max_workers,
+        )
