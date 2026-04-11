@@ -21,7 +21,7 @@ import json
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
-from trajectory_store import iter_trajectories, load_trajectory
+from trajectory_store import iter_trajectories, load_trajectory, load_trajectory_metadata
 
 
 JUDGE_RESULT_FILE = "judge_result.json"
@@ -251,8 +251,7 @@ def summarize_collection_quality(base_dir: str | Path) -> dict:
 
     for _, traj_path in iter_trajectories(base_dir):
         total += 1
-        traj = load_trajectory(traj_path, include_heavy=False)
-        meta = traj.get("metadata", {})
+        meta = load_trajectory_metadata(traj_path)
         steps = int(meta.get("num_steps", 0) or 0)
         total_steps += steps
         reason = meta.get("termination_reason", "unknown")
