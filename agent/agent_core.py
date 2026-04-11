@@ -104,6 +104,7 @@ def run_steps(
     model: str | None = None,
     max_steps: int = 4,
     include_raw_model_output: bool = False,
+    screenshot_every_n_steps: int = 1,
 ) -> str:
     """
     Core observe -> act -> record loop.
@@ -124,10 +125,16 @@ def run_steps(
     last_action: str | None = None
     step_latencies_ms: list[float] = []
 
+    screenshot_every_n_steps = max(0, screenshot_every_n_steps)
+    include_initial_screenshot = screenshot_every_n_steps > 0
+
     # persist pre-action initial state as a full snapshot...
     # this uses step=-1 to avoid colliding with action steps 0..N-1. lowkey jank?
-    initial_screenshot_path = tw.screenshot_path_for(-1)
-    initial_state = env.capture_full_state(initial_screenshot_path)
+    initial_screenshot_path = tw.screenshot_path_for(-1) if include_initial_screenshot else None
+    initial_state = env.capture_full_state(
+        initial_screenshot_path,
+        include_screenshot=include_initial_screenshot,
+    )
     tw.write_step(
         step=-1,
         state=initial_state,
@@ -172,8 +179,12 @@ def run_steps(
                 exec_result = env.execute_action(parsed)
                 print(f"  [step {step_num}] exec: {exec_result!r}")
 
-        screenshot_path = tw.screenshot_path_for(step_num)
-        state = env.capture_full_state(screenshot_path)
+        include_screenshot = screenshot_every_n_steps > 0 and (step_num % screenshot_every_n_steps == 0)
+        screenshot_path = tw.screenshot_path_for(step_num) if include_screenshot else None
+        state = env.capture_full_state(
+            screenshot_path,
+            include_screenshot=include_screenshot,
+        )
 
         exec_ok = bool(exec_result and exec_result.get("ok"))
         extra = {

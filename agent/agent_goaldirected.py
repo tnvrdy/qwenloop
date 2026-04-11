@@ -17,8 +17,7 @@ from pathlib import Path
 from agent.agent_core import run_steps
 from browser_env import BrowserEnv
 from utils.collection_config import CollectionIOConfig, resolve_io_config
-from utils.io_utils import dir_size_bytes
-from trajectory_store import TrajectoryWriter, load_trajectory
+from trajectory_store import TrajectoryWriter, load_trajectory_metadata
 
 
 def _validate_max_steps(max_steps: int) -> int:
@@ -52,6 +51,7 @@ def run_exploration_episode(
         writer_queue_size=writer_queue_size,
         compress_heavy=compress_heavy,
         include_raw_model_output=include_raw_model_output,
+        screenshot_every_n_steps=1,
     )
     with (
         BrowserEnv(headless=headless) as env,
@@ -74,6 +74,7 @@ def run_exploration_episode(
             model=model,
             max_steps=max_steps,
             include_raw_model_output=cfg.include_raw_model_output,
+            screenshot_every_n_steps=cfg.screenshot_every_n_steps,
         )
         tw.set_termination_reason(reason)
         print(f"[episode] done ({reason})")
@@ -91,6 +92,7 @@ def run_task_batch(
     writer_queue_size: int = 256,
     compress_heavy: bool = False,
     include_raw_model_output: bool = False,
+    collect_size_metrics: bool = True,
     io_config: CollectionIOConfig | None = None,
 ) -> list[dict]:
     """
@@ -103,6 +105,10 @@ def run_task_batch(
     """
     results: list[dict] = []
     max_steps = _validate_max_steps(max_steps)
+    _dir_size_bytes = None
+    if collect_size_metrics:
+        from utils.io_utils import dir_size_bytes as _dir_size_bytes
+
     cfg = resolve_io_config(
         io_config,
         writer_flush_every=writer_flush_every,
@@ -110,6 +116,7 @@ def run_task_batch(
         writer_queue_size=writer_queue_size,
         compress_heavy=compress_heavy,
         include_raw_model_output=include_raw_model_output,
+        screenshot_every_n_steps=1,
     )
 
     with BrowserEnv(headless=headless) as env:
@@ -139,12 +146,13 @@ def run_task_batch(
                         model=model,
                         max_steps=max_steps,
                         include_raw_model_output=cfg.include_raw_model_output,
+                        screenshot_every_n_steps=cfg.screenshot_every_n_steps,
                     )
                     tw.set_termination_reason(reason)
                     traj_dir = tw.traj_dir
 
                 elapsed_s = time.perf_counter() - ep_start
-                meta = load_trajectory(traj_dir, include_heavy=False)["metadata"]
+                meta = load_trajectory_metadata(traj_dir)
 
                 results.append({
                     "status": "ok",
@@ -152,9 +160,12 @@ def run_task_batch(
                     "num_steps": meta.get("num_steps", 0),
                     "termination_reason": meta.get("termination_reason", "unknown"),
                     "elapsed_seconds": round(elapsed_s, 3),
-                    "bytes_written": dir_size_bytes(traj_dir),
+                    "bytes_written": 0,
                     "runtime_metrics": meta.get("runtime_metrics", {}),
                 })
+                if collect_size_metrics:
+                    assert _dir_size_bytes is not None
+                    results[-1]["bytes_written"] = _dir_size_bytes(traj_dir)
                 print(f"[batch {i + 1}/{len(tasks)}] done ({reason})")
 
             except Exception as e:

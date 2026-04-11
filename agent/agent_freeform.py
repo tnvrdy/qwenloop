@@ -175,6 +175,7 @@ def run_freeform_session(
         writer_queue_size=writer_queue_size,
         compress_heavy=compress_heavy,
         include_raw_model_output=include_raw_model_output,
+        screenshot_every_n_steps=1,
     )
 
     with BrowserEnv(headless=headless) as env:
@@ -203,6 +204,7 @@ def run_freeform_session(
                     model=model,
                     max_steps=max_steps,
                     include_raw_model_output=cfg.include_raw_model_output,
+                    screenshot_every_n_steps=cfg.screenshot_every_n_steps,
                 )
                 tw.add_metadata({"collection_elapsed_seconds": round(time.perf_counter() - ep_start, 3)})
                 tw.set_termination_reason(reason)
