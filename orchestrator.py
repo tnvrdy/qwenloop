@@ -123,6 +123,12 @@ def _chunk(lst, n):
     return [lst[i:i + k] for i in range(0, len(lst), k)]
 
 
+def _validate_workers(max_workers: int) -> int:
+    if max_workers < 1:
+        raise ValueError("max_workers must be >= 1")
+    return max_workers
+
+
 def _load_tasks(path, limit=None):
     tasks = []
     with open(path) as f:
@@ -240,6 +246,7 @@ def run_tasks(
     Run goal-directed exploration episodes in parallel.
     """
     trajectories_dir = str(Path(trajectories_dir).resolve())
+    max_workers = _validate_workers(max_workers)
     max_steps = _validate_max_steps(max_steps)
     if collect_size_metrics is None:
         collect_size_metrics = not scale_mode
@@ -377,6 +384,7 @@ def run_freeform(
     collect_size_metrics: bool | None = None,
 ) -> dict:
     trajectories_dir = str(Path(trajectories_dir).resolve())
+    max_workers = _validate_workers(max_workers)
     max_steps = _validate_max_steps(max_steps)
     if collect_size_metrics is None:
         collect_size_metrics = not scale_mode
@@ -394,6 +402,10 @@ def run_freeform(
     if seeds is None:
         from task_generation.task_generator import DEFAULT_SEEDS
         seeds = [s["url"] for s in DEFAULT_SEEDS]
+    if not seeds:
+        raise ValueError("freeform seeds list cannot be empty")
+    if episodes_per_worker < 1:
+        raise ValueError("episodes_per_worker must be >= 1")
 
     print(f"Orchestrator: {max_workers} freeform workers, {episodes_per_worker} episodes each")
     print(f"Output: {trajectories_dir}\n")
