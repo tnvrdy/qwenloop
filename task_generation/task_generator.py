@@ -626,7 +626,6 @@ if __name__ == "__main__":
             max_sites_per_source=args.max_sites_per_source,
             mind2web_websites_file=args.mind2web_websites_file,
             materialize_seed_corpus=args.materialize_seed_corpus,
-            stage2_batch_size=args.stage2_batch_size,
         )
         print(f"Validation complete. {len(resolved)} seeds resolved.")
     else:
@@ -641,4 +640,5 @@ if __name__ == "__main__":
             max_sites_per_source=args.max_sites_per_source,
             mind2web_websites_file=args.mind2web_websites_file,
             materialize_seed_corpus=args.materialize_seed_corpus,
+            stage2_batch_size=args.stage2_batch_size,
         )
