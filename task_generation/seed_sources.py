@@ -61,6 +61,25 @@ def normalize_url(raw: str) -> str:
     host = p.netloc.lower()
     if host.startswith("www."):
         host = host[4:]
+    if not host:
+        return ""
+
+    # keep obviously bad host artifacts out of the seed pool
+    if "." not in host and host != "localhost":
+        if len(host) < 4:
+            return ""
+        if not re.fullmatch(r"[a-z0-9-]+", host):
+            return ""
+        host = f"{host}.com"
+
+    # Require plausible public-domain structure unless localhost.
+    if host != "localhost":
+        if not re.fullmatch(r"[a-z0-9-]+(?:\.[a-z0-9-]+)+", host):
+            return ""
+        tld = host.rsplit(".", 1)[-1]
+        if len(tld) < 2 or len(tld) > 24:
+            return ""
+
     path = (p.path or "/").rstrip("/")
     path = path or "/"
     # Keep homepage URLs canonical for seeds.
