@@ -6,6 +6,8 @@ DashScope is OpenAI-compatible, so we use the OpenAI SDK for both providers.
 Env vars:
   QWEN_API_KEY (required for provider="qwen")
   OPENAI_API_KEY (required for provider="openai")
+  GEMINI_API_KEY (required for provider="gemini")
+  LLM_PROVIDER (optional default provider: qwen|openai|gemini, default=qwen)
   LLM_RATE_LIMIT_QPS (optional)
   LLM_RATE_LIMIT_MODE (optional: file_lock|process|none, default=file_lock)
   LLM_MAX_ATTEMPTS (optional, default=4)
@@ -29,11 +31,16 @@ _RETRYABLE = (openai.RateLimitError, openai.APIConnectionError,
               openai.APITimeoutError, openai.InternalServerError)
 
 
-DASHSCOPE_BASE_URL = "https://dashscope-us.aliyuncs.com/compatible-mode/v1"
-OPENAI_BASE_URL = "https://api.openai.com/v1"
+DASHSCOPE_BASE_URL = os.environ.get(
+    "QWEN_BASE_URL",
+    "https://dashscope-us.aliyuncs.com/compatible-mode/v1",
+)
+OPENAI_BASE_URL = os.environ.get("OPENAI_BASE_URL", "https://api.openai.com/v1")
+GEMINI_BASE_URL = os.environ.get("GEMINI_BASE_URL", "https://generativelanguage.googleapis.com/v1beta/openai/")
 
-QWEN_DEFAULT_MODEL = "qwen-plus"
-OPENAI_DEFAULT_MODEL = "gpt-4o-mini"
+QWEN_DEFAULT_MODEL = os.environ.get("QWEN_MODEL", "qwen-plus")
+OPENAI_DEFAULT_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
+GEMINI_DEFAULT_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 
 _client_cache: dict[tuple[str, str], OpenAI] = {}
 _process_rate_lock = threading.Lock()
@@ -52,7 +59,7 @@ def chat(
     model: str | None = None,
     temperature: float = 0.7,
     max_tokens: int = 256,
-    provider: str = "qwen",
+    provider: str | None = None,
     base_url: str | None = None,
     api_key: str | None = None,
 ) -> str:
@@ -64,18 +71,27 @@ def chat(
         model: Override the default model for the chosen provider.
         temperature: Sampling temperature (0.7 default for exploration diversity).
         max_tokens: Budget for the reply.
-        provider: "qwen" or "openai".
+        provider: "qwen", "openai", or "gemini". If omitted, uses LLM_PROVIDER or "qwen".
         base_url: Override the default API endpoint.
         api_key: Override the env-var API key.
     """
-    if provider == "qwen":
+    resolved_provider = (provider or os.environ.get("LLM_PROVIDER", "qwen")).strip().lower()
+    if resolved_provider == "qwen":
         resolved_key = api_key or os.environ["QWEN_API_KEY"]
         resolved_url = base_url or DASHSCOPE_BASE_URL
         resolved_model = model or QWEN_DEFAULT_MODEL
-    else:
+    elif resolved_provider == "openai":
         resolved_key = api_key or os.environ["OPENAI_API_KEY"]
         resolved_url = base_url or OPENAI_BASE_URL
         resolved_model = model or OPENAI_DEFAULT_MODEL
+    elif resolved_provider == "gemini":
+        resolved_key = api_key or os.environ["GEMINI_API_KEY"]
+        resolved_url = base_url or GEMINI_BASE_URL
+        resolved_model = model or GEMINI_DEFAULT_MODEL
+    else:
+        raise ValueError(
+            f"unknown provider {resolved_provider!r}; expected one of: qwen, openai, gemini"
+        )
 
     client = _get_client(resolved_url, resolved_key)
 
@@ -97,7 +113,7 @@ def chat(
                 _emit_retry_telemetry(
                     event="retry_exhausted",
                     model=resolved_model,
-                    provider=provider,
+                    provider=resolved_provider,
                     attempt=attempt + 1,
                     error_type=type(e).__name__,
                     sleep_seconds=0.0,
@@ -108,7 +124,7 @@ def chat(
             _emit_retry_telemetry(
                 event="retry",
                 model=resolved_model,
-                provider=provider,
+                provider=resolved_provider,
                 attempt=attempt + 1,
                 error_type=type(e).__name__,
                 sleep_seconds=sleep_s,
