@@ -13,8 +13,9 @@ import json
 import os
 import time
 import traceback
-from concurrent.futures import ProcessPoolExecutor, as_completed
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
 from utils.collection_config import CollectionIOConfig, resolve_io_config
 from utils.io_utils import dir_size_bytes
@@ -129,16 +130,74 @@ def _validate_workers(max_workers: int) -> int:
     return max_workers
 
 
+def _validate_worker_backend(worker_backend: str) -> str:
+    backend = (worker_backend or "").strip().lower()
+    if backend not in {"process", "thread"}:
+        raise ValueError("worker_backend must be one of: process, thread")
+    return backend
+
+
 def _load_tasks(path, limit=None):
     tasks = []
+    skipped_invalid = 0
+    normalized = 0
     with open(path) as f:
         for line in f:
             line = line.strip()
             if line:
-                tasks.append(json.loads(line))
+                task = json.loads(line)
+                raw_url = str(task.get("url", "")).strip()
+                fixed_url = _normalize_task_url(raw_url)
+                if fixed_url is None:
+                    skipped_invalid += 1
+                    continue
+                if fixed_url != raw_url:
+                    normalized += 1
+                task["url"] = fixed_url
+                tasks.append(task)
                 if limit and len(tasks) >= limit:
                     break
+    if normalized:
+        print(f"Orchestrator: normalized {normalized} task URL(s)")
+    if skipped_invalid:
+        print(f"Orchestrator: skipped {skipped_invalid} invalid task URL(s)")
     return tasks
+
+
+def _normalize_task_url(url: str) -> str | None:
+    if not url:
+        return None
+    raw = url.strip()
+    candidate = raw if "://" in raw else f"https://{raw}"
+    parsed = urlparse(candidate)
+    if parsed.scheme not in {"http", "https"}:
+        return None
+
+    host = (parsed.hostname or "").strip().lower()
+    if not host:
+        return None
+
+    # common task artifact: bare host without TLD, e.g. "https://apple/"
+    # reject short/noisy placeholders!!!!
+    if "." not in host and host not in {"localhost"}:
+        if len(host) < 4:
+            return None
+        host = f"{host}.com"
+
+    if "." not in host and host != "localhost":
+        return None
+
+    netloc = host
+    if parsed.port is not None:
+        netloc = f"{host}:{parsed.port}"
+    if parsed.username:
+        auth = parsed.username
+        if parsed.password:
+            auth = f"{auth}:{parsed.password}"
+        netloc = f"{auth}@{netloc}"
+
+    normalized = parsed._replace(scheme=parsed.scheme.lower(), netloc=netloc)
+    return urlunparse(normalized)
 
 
 def _write_summary(summary, trajectories_dir):
@@ -241,12 +300,14 @@ def run_tasks(
     screenshot_every_n_steps: int = 1,
     scale_mode: bool = False,
     collect_size_metrics: bool | None = None,
+    worker_backend: str = "process",
 ) -> dict:
     """
     Run goal-directed exploration episodes in parallel.
     """
     trajectories_dir = str(Path(trajectories_dir).resolve())
     max_workers = _validate_workers(max_workers)
+    worker_backend = _validate_worker_backend(worker_backend)
     max_steps = _validate_max_steps(max_steps)
     if collect_size_metrics is None:
         collect_size_metrics = not scale_mode
@@ -285,13 +346,15 @@ def run_tasks(
     chunks = _chunk(tasks, n_workers)
 
     print(f"Orchestrator: {len(tasks)} tasks, {n_workers} workers (batch size ~{len(chunks[0]) if chunks else 0})")
+    print(f"Worker backend: {worker_backend}")
     print(f"Output: {trajectories_dir}\n")
 
     results = []
     worker_failures: list[dict] = []
     t0 = time.time()
 
-    with ProcessPoolExecutor(max_workers=n_workers) as pool:
+    executor_cls = ProcessPoolExecutor if worker_backend == "process" else ThreadPoolExecutor
+    with executor_cls(max_workers=n_workers) as pool:
         futures = {
             pool.submit(
                 _run_task_batch,
@@ -338,6 +401,7 @@ def run_tasks(
 
     summary = {
         "mode": "tasks",
+        "worker_backend": worker_backend,
         "total_tasks": len(tasks),
         "completed": completed,
         "errors": errors,
@@ -382,9 +446,11 @@ def run_freeform(
     screenshot_every_n_steps: int = 1,
     scale_mode: bool = False,
     collect_size_metrics: bool | None = None,
+    worker_backend: str = "process",
 ) -> dict:
     trajectories_dir = str(Path(trajectories_dir).resolve())
     max_workers = _validate_workers(max_workers)
+    worker_backend = _validate_worker_backend(worker_backend)
     max_steps = _validate_max_steps(max_steps)
     if collect_size_metrics is None:
         collect_size_metrics = not scale_mode
@@ -408,13 +474,15 @@ def run_freeform(
         raise ValueError("episodes_per_worker must be >= 1")
 
     print(f"Orchestrator: {max_workers} freeform workers, {episodes_per_worker} episodes each")
+    print(f"Worker backend: {worker_backend}")
     print(f"Output: {trajectories_dir}\n")
 
     results = []
     worker_failures: list[dict] = []
     t0 = time.time()
 
-    with ProcessPoolExecutor(max_workers=max_workers) as pool:
+    executor_cls = ProcessPoolExecutor if worker_backend == "process" else ThreadPoolExecutor
+    with executor_cls(max_workers=max_workers) as pool:
         futures = {
             pool.submit(
                 _run_freeform,
@@ -470,6 +538,7 @@ def run_freeform(
 
     summary = {
         "mode": "freeform",
+        "worker_backend": worker_backend,
         "workers": max_workers,
         "total_trajectories": total_trajs,
         "meaningful": total_meaningful,
@@ -503,6 +572,12 @@ def _p95(values: list[float]) -> float | None:
 
 
 def _add_common_collection_args(p: argparse.ArgumentParser) -> None:
+    p.add_argument(
+        "--worker-backend",
+        choices=["process", "thread"],
+        default="process",
+        help="Parallel worker backend. Use thread for lightweight local runs, process for stronger isolation.",
+    )
     p.add_argument("--headed", action="store_true")
     p.add_argument("--writer-flush-interval", type=int, default=8)
     p.add_argument("--llm-qps", type=float, default=None)
@@ -542,6 +617,7 @@ def _common_run_kwargs(args) -> dict:
         "collect_size_metrics": args.collect_size_metrics,
         "include_raw_model_output": args.include_raw_model_output,
         "llm_qps": args.llm_qps,
+        "worker_backend": args.worker_backend,
     }
 
 
