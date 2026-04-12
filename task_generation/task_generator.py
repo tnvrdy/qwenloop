@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 from pathlib import Path
 
@@ -175,6 +176,31 @@ Return a JSON array of objects, each with a "goal" field.
 Return ONLY the JSON array, no other text."""
 
 
+_TASK_GEN_BATCH_PROMPT = """\
+You are creating browsing tasks to test web-agent navigation.
+
+You will receive multiple websites with their "common user activities".
+For EACH website, create exactly {n} diverse goals.
+
+RULES:
+1. End-state only (no procedural steps).
+2. Outcome-oriented and realistic; typically longer-horizon tasks.
+3. No login/account creation/payment/personal info.
+4. Agent capabilities: click, type, scroll, goto.
+
+INPUT SITES:
+{sites_block}
+
+Return ONLY a JSON array of objects with this exact schema:
+[
+  {{"url": "<site url>", "goals": ["goal 1", "goal 2", "... exactly {n} goals ..."]}},
+  ...
+]
+
+Every returned URL must match one input URL exactly.
+Return JSON only, no markdown, no extra keys."""
+
+
 # json response parsing
 
 def _strip_markdown_fences(text: str) -> str:
@@ -222,6 +248,103 @@ def _get_common_activities(url: str, description: str) -> str:
     return "\n".join(f"  - {a}" for a in activities)
 
 
+def _generate_tasks_from_activities(
+    url: str,
+    activities_text: str,
+    *,
+    n: int,
+    model: str | None,
+    seed_source: str | None,
+) -> list[dict]:
+    prompt = _TASK_GEN_PROMPT.format(url=url, activities_text=activities_text, n=n)
+    raw = chat(
+        messages=[{"role": "user", "content": prompt}],
+        provider="openai",
+        model=model,
+        temperature=0.9,
+        max_tokens=4096,
+    )
+    return _parse_tasks_response(raw, url, seed_source=seed_source)
+
+
+def _render_sites_block(sites: list[dict]) -> str:
+    chunks = []
+    for idx, site in enumerate(sites, 1):
+        chunks.append(
+            "\n".join(
+                [
+                    f"Site {idx}:",
+                    f"URL: {site['url']}",
+                    f"Description: {site.get('description', '')}",
+                    "Common activities:",
+                    site["activities_text"],
+                ]
+            )
+        )
+    return "\n\n".join(chunks)
+
+
+def _parse_batched_tasks_response(
+    raw: str,
+    *,
+    expected_urls: set[str],
+    n: int,
+    source_by_url: dict[str, str | None],
+) -> dict[str, list[dict]]:
+    out: dict[str, list[dict]] = {u: [] for u in expected_urls}
+    arr = _parse_json_list(raw)
+    for item in arr:
+        if not isinstance(item, dict):
+            continue
+        url = str(item.get("url", "")).strip()
+        if url not in expected_urls:
+            continue
+        goals = item.get("goals")
+        if not isinstance(goals, list):
+            continue
+        for g in goals:
+            goal = str(g).strip()
+            if not goal:
+                continue
+            row = {"url": url, "goal": goal}
+            src = source_by_url.get(url)
+            if src:
+                row["seed_source"] = src
+            out[url].append(row)
+        if len(out[url]) > n:
+            out[url] = out[url][:n]
+    return out
+
+
+def _generate_tasks_for_site_batch(
+    sites: list[dict],
+    *,
+    n: int,
+    model: str | None,
+) -> dict[str, list[dict]]:
+    if not sites:
+        return {}
+    expected_urls = {s["url"] for s in sites}
+    source_by_url = {s["url"]: s.get("seed_source") for s in sites}
+    prompt = _TASK_GEN_BATCH_PROMPT.format(n=n, sites_block=_render_sites_block(sites))
+    raw = chat(
+        messages=[{"role": "user", "content": prompt}],
+        provider="openai",
+        model=model,
+        temperature=0.9,
+        max_tokens=8192,
+    )
+    parsed = _parse_batched_tasks_response(
+        raw,
+        expected_urls=expected_urls,
+        n=n,
+        source_by_url=source_by_url,
+    )
+    if not any(parsed.values()):
+        raise ValueError("batched stage-2 returned no parseable goals")
+    return parsed
+
+
 def generate_tasks_for_site(
     url: str,
     description: str,
@@ -233,15 +356,13 @@ def generate_tasks_for_site(
     activities_text = _get_common_activities(url, description)
 
     print(f"    stage 2: generating {n} tasks ...")
-    prompt = _TASK_GEN_PROMPT.format(url=url, activities_text=activities_text, n=n)
-    raw = chat(
-        messages=[{"role": "user", "content": prompt}],
-        provider="openai",
+    return _generate_tasks_from_activities(
+        url,
+        activities_text,
+        n=n,
         model=model,
-        temperature=0.9,
-        max_tokens=4096,
+        seed_source=seed_source,
     )
-    return _parse_tasks_response(raw, url, seed_source=seed_source)
 
 
 def _coerce_source_set(raw: str | None) -> set[str]:
@@ -347,7 +468,10 @@ def generate_all_tasks(
     max_sites_per_source: int | None = None,
     mind2web_websites_file: str | None = None,
     materialize_seed_corpus: str | None = None,
+    stage2_batch_size: int = 3,
 ) -> int:
+    if stage2_batch_size < 1:
+        raise ValueError("stage2_batch_size must be >= 1")
     if seeds is None:
         seeds = _build_seed_pool(
             model=model,
@@ -362,24 +486,64 @@ def generate_all_tasks(
     output_path = Path(output_path)
     total = 0
 
+    # stage 1 remains per-site
+    site_rows: list[dict] = []
+    for i, seed in enumerate(seeds):
+        url = seed["url"]
+        desc = seed["description"]
+        src = seed.get("source")
+        print(f"[{i + 1}/{len(seeds)}] {url}")
+        try:
+            print("    stage 1: brainstorming activities ...")
+            activities_text = _get_common_activities(url, desc)
+        except Exception as e:
+            print(f"  WARNING: stage-1 failed for {url}: {e}")
+            continue
+        site_rows.append(
+            {
+                "url": url,
+                "description": desc,
+                "seed_source": src,
+                "activities_text": activities_text,
+            }
+        )
+
     with open(output_path, "w") as f:
-        for i, seed in enumerate(seeds):
-            url = seed["url"]
-            desc = seed["description"]
-            src = seed.get("source")
-            print(f"[{i + 1}/{len(seeds)}] {url}")
+        for b_start in range(0, len(site_rows), stage2_batch_size):
+            batch = site_rows[b_start : b_start + stage2_batch_size]
+            batch_idx = b_start // stage2_batch_size + 1
+            print(
+                f"    stage 2: generating {tasks_per_site} tasks/site for batch {batch_idx} "
+                f"({len(batch)} sites)"
+            )
 
+            batch_tasks: dict[str, list[dict]]
             try:
-                tasks = generate_tasks_for_site(url, desc, n=tasks_per_site, model=model, seed_source=src)
+                batch_tasks = _generate_tasks_for_site_batch(batch, n=tasks_per_site, model=model)
             except Exception as e:
-                print(f"  WARNING: failed for {url}: {e}")
-                continue
+                print(f"  WARNING: batched stage-2 failed ({e}); falling back to per-site stage-2 for this batch")
+                batch_tasks = {}
 
-            for task in tasks:
-                f.write(json.dumps(task, ensure_ascii=False) + "\n")
-
-            total += len(tasks)
-            print(f"  got {len(tasks)} tasks (total: {total})\n")
+            for site in batch:
+                url = site["url"]
+                tasks = batch_tasks.get(url, [])
+                if not tasks:
+                    try:
+                        tasks = _generate_tasks_from_activities(
+                            url,
+                            site["activities_text"],
+                            n=tasks_per_site,
+                            model=model,
+                            seed_source=site.get("seed_source"),
+                        )
+                    except Exception as e:
+                        print(f"  WARNING: fallback stage-2 failed for {url}: {e}")
+                        continue
+                for task in tasks:
+                    f.write(json.dumps(task, ensure_ascii=False) + "\n")
+                total += len(tasks)
+                print(f"  got {len(tasks)} tasks for {url} (total: {total})")
+            print()
 
     print(f"Done. {total} tasks written to {output_path}")
     return total
@@ -421,11 +585,35 @@ if __name__ == "__main__":
                         help="Number of seed sites to use after filtering/deduplication.")
     parser.add_argument("--model", default=None, help="LLM model override")
     parser.add_argument(
+        "--stage2-batch-size",
+        type=int,
+        default=3,
+        help="How many websites to batch together for stage-2 task generation (recommended: 2-3).",
+    )
+    parser.add_argument(
+        "--llm-qps",
+        type=float,
+        default=2.0,
+        help="Set LLM_RATE_LIMIT_QPS for this taskgen run (default: 2.0).",
+    )
+    parser.add_argument(
+        "--llm-max-attempts",
+        type=int,
+        default=10,
+        help="Set LLM_MAX_ATTEMPTS for this taskgen run (default: 10).",
+    )
+    parser.add_argument(
         "--validate-seeds-only",
         action="store_true",
         help="Only resolve/validate seed corpus and exit without generating tasks",
     )
     args = parser.parse_args()
+    os.environ["LLM_RATE_LIMIT_QPS"] = str(args.llm_qps)
+    os.environ["LLM_MAX_ATTEMPTS"] = str(args.llm_max_attempts)
+    print(
+        f"[llm-config] LLM_RATE_LIMIT_QPS={os.environ['LLM_RATE_LIMIT_QPS']} "
+        f"LLM_MAX_ATTEMPTS={os.environ['LLM_MAX_ATTEMPTS']}"
+    )
 
     seeds = _load_seeds(args.seeds) if args.seeds else None
     if args.validate_seeds_only:
@@ -437,6 +625,7 @@ if __name__ == "__main__":
             max_sites_per_source=args.max_sites_per_source,
             mind2web_websites_file=args.mind2web_websites_file,
             materialize_seed_corpus=args.materialize_seed_corpus,
+            stage2_batch_size=args.stage2_batch_size,
         )
         print(f"Validation complete. {len(resolved)} seeds resolved.")
     else:
