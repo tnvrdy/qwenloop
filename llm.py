@@ -95,11 +95,10 @@ def chat(
 
     client = _get_client(resolved_url, resolved_key)
 
-    _acquire_rate_limit_slot()
-
     delay = 2.0
     MAX_ATTEMPTS = int(os.environ.get("LLM_MAX_ATTEMPTS", "4"))
     for attempt in range(MAX_ATTEMPTS):
+        _acquire_rate_limit_slot()
         try:
             response = client.chat.completions.create(
                 model=resolved_model,
