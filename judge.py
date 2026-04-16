@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from pathlib import Path
 
@@ -25,6 +26,8 @@ from trajectory_store import iter_trajectories, load_trajectory, load_trajectory
 
 
 JUDGE_RESULT_FILE = "judge_result.json"
+FAILED_DIR_DEFAULT = "judge_says_failed"
+AUTO_FAIL_TERMINATION_REASONS = {"stuck", "consecutive_failures", "unknown"}
 
 _AX_TREE_PREVIEW_LINES = 40
 
@@ -117,6 +120,19 @@ def judge_trajectory(
     goal = meta.get("goal", "(unknown goal)")
     start_url = meta.get("start_url", "(unknown)")
     traj_id = meta.get("trajectory_id", traj_dir.name)
+    termination_reason = str(meta.get("termination_reason", "unknown"))
+
+    if termination_reason in AUTO_FAIL_TERMINATION_REASONS:
+        result = {
+            "trajectory_id": traj_id,
+            "score": 1,
+            "pass": False,
+            "threshold": threshold,
+            "response": f"(auto-fail: termination_reason={termination_reason})",
+            "prompt_length": 0,
+        }
+        _write_result(traj_dir, result)
+        return result
 
     if not steps:
         result = {
@@ -181,6 +197,7 @@ def judge_all_trajectories(
     failed = 0
     skipped = 0
     errors = 0
+    failed_paths: list[Path] = []
 
     trajs = list(iter_trajectories(base_dir))
     print(f"Judging {len(trajs)} trajectories in {base_dir}")
@@ -202,6 +219,7 @@ def judge_all_trajectories(
                     passed += 1
                 else:
                     failed += 1
+                    failed_paths.append(traj_path)
                 print(f"  [{i + 1}/{len(pending)}] {traj_id}: score={result['score']} {'PASS' if result['pass'] else 'FAIL'}")
             except Exception as e:
                 errors += 1
@@ -209,19 +227,20 @@ def judge_all_trajectories(
     else:
         with ProcessPoolExecutor(max_workers=max_workers) as pool:
             futures = {
-                pool.submit(judge_trajectory, traj_path, threshold, model): traj_id
+                pool.submit(judge_trajectory, traj_path, threshold, model): (traj_id, traj_path)
                 for traj_id, traj_path in pending
             }
             done = 0
             for future in as_completed(futures):
                 done += 1
-                traj_id = futures[future]
+                traj_id, traj_path = futures[future]
                 try:
                     result = future.result()
                     if result["pass"]:
                         passed += 1
                     else:
                         failed += 1
+                        failed_paths.append(traj_path)
                     print(f"  [{done}/{len(pending)}] {traj_id}: score={result['score']} {'PASS' if result['pass'] else 'FAIL'}")
                 except Exception as e:
                     errors += 1
@@ -234,6 +253,9 @@ def judge_all_trajectories(
         "skipped": skipped,
         "errors": errors,
     }
+    copied = _copy_failed_trajectories(base_dir, failed_paths)
+    summary["failed_copied_to"] = str(base_dir / FAILED_DIR_DEFAULT)
+    summary["failed_copied_count"] = copied
     print(f"\nSummary: {summary}")
     return summary
 
@@ -286,6 +308,23 @@ def summarize_collection_quality(base_dir: str | Path) -> dict:
 def _write_result(traj_dir: Path, result: dict) -> None:
     path = traj_dir / JUDGE_RESULT_FILE
     path.write_text(json.dumps(result, indent=2, ensure_ascii=False) + "\n")
+
+
+def _copy_failed_trajectories(base_dir: Path, failed_paths: list[Path]) -> int:
+    failed_root = base_dir / FAILED_DIR_DEFAULT
+    failed_root.mkdir(parents=True, exist_ok=True)
+    copied = 0
+    seen: set[Path] = set()
+    for traj_path in failed_paths:
+        if traj_path in seen:
+            continue
+        seen.add(traj_path)
+        dst = failed_root / traj_path.name
+        if dst.exists():
+            shutil.rmtree(dst)
+        shutil.copytree(traj_path, dst)
+        copied += 1
+    return copied
 
 
 if __name__ == "__main__":
